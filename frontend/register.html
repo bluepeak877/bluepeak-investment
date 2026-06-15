@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BluePeak Register</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<main class="auth-page">
+  <section class="auth-panel">
+
+  <img src="./images/logo.png" class="auth-logo" alt="BluePeak">
+
+  <div class="bonus-banner">
+    🎁 Get ₦1,500 Welcome Bonus After Registration
+  </div>
+
+  <div class="auth-badge">
+    🚀 Join BluePeak Today
+  </div>
+
+  <h1>Create Account</h1>
+
+  <p class="auth-desc">
+    Start your investment journey with BluePeak and earn daily returns while growing your portfolio.
+  </p>
+
+  <div class="auth-benefits">
+    <span>🎁 ₦1,500 Welcome Bonus</span>
+    <span>👥 30% Referral Bonus</span>
+    <span>📈 Daily ROI</span>
+  </div>
+
+  <div class="input-group">
+    <label>Full Name</label>
+    <input
+      type="text"
+      id="fullName"
+      placeholder="Enter full name"
+    >
+  </div>
+
+  <div class="input-group">
+    <label>Email Address</label>
+    <input
+      type="email"
+      id="email"
+      placeholder="you@example.com"
+    >
+  </div>
+
+  <div class="input-group">
+    <label>Phone Number</label>
+    <input
+      type="text"
+      id="phone"
+      placeholder="08012345678"
+    >
+  </div>
+
+  <div class="input-group">
+    <label>Password</label>
+
+    <div class="password-box">
+      <input
+        type="password"
+        id="password"
+        placeholder="At least 8 characters"
+      >
+
+      <button
+        type="button"
+        class="toggle-password"
+        onclick="togglePassword()"
+      >
+        👁
+      </button>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label>Referral Code (Optional)</label>
+    <input
+      type="text"
+      id="referralCode"
+      placeholder="Enter referral code"
+    >
+  </div>
+
+  <button id="registerBtn" class="primary-btn">
+    Create Account
+  </button>
+
+  <p id="message" class="form-message"></p>
+
+  <div class="login-trust">
+
+    <div class="trust-item">
+      🔒 Secure Registration
+    </div>
+
+    <div class="trust-item">
+      🎁 Instant Welcome Bonus
+    </div>
+
+    <div class="trust-item">
+      👥 Earn 30% Referral Rewards
+    </div>
+
+  </div>
+
+  <p class="auth-switch">
+    Already have an account?
+    <a href="login.html">Login</a>
+  </p>
+
+</section>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+
+if (ref) {
+  document.getElementById("referralCode").value = ref;
+}
+
+async function registerUser() {
+  const message = document.getElementById("message");
+  const button = document.getElementById("registerBtn");
+  const payload = {
+    fullName: document.getElementById("fullName").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    password: document.getElementById("password").value,
+    referralCode: document.getElementById("referralCode").value.trim(),
+  };
+
+  if (!payload.fullName || !payload.email || !payload.phone || !payload.password) {
+    message.innerText = "Full name, email, phone, and password are required.";
+    message.className="form-message error";
+    return;
+  }
+
+  button.disabled = true;
+  button.innerText = "Creating...";
+  message.innerText = "";
+
+  try {
+    const response = await fetch("http://localhost:3001/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    message.innerText = data.message;
+    message.className = "form-message";
+
+    message.classList.add(
+      response.ok ? "success" : "error"
+    );
+
+    if (response.ok) {
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 800);
+    }
+  } catch (error) {
+    console.log("REGISTER ERROR:", error);
+    message.innerText = "Something went wrong.";
+    message.className = "form-message error";
+  } finally {
+    button.disabled = false;
+    button.innerText = "Register";
+  }
+}
+
+document.getElementById("registerBtn").addEventListener("click", registerUser);
+
+function togglePassword() {
+  const password =
+    document.getElementById("password");
+
+  password.type =
+    password.type === "password"
+      ? "text"
+      : "password";
+}
+</script>
+
+</body>
+</html>

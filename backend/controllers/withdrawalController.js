@@ -1,0 +1,246 @@
+const Withdrawal = require("../models/Withdrawal");
+const User = require("../models/user");
+const Transaction = require("../models/Transaction");
+const WithdrawalAnnouncement = require("../models/WithdrawalAnnouncement");
+
+exports.createWithdrawal = async (req, res) => {
+  try {
+    const {
+      amount,
+      bankName,
+      accountNumber,
+      accountName,
+    } = req.body;
+
+    const withdrawalAmount = Number(amount);
+
+    if (
+      !withdrawalAmount ||
+      withdrawalAmount <= 0 ||
+      !bankName ||
+      !accountNumber ||
+      !accountName
+    ) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const availableBalance =
+      Number(user.depositWallet || 0) +
+      Number(user.referralWallet || 0) +
+      Number(user.withdrawableWallet || 0);
+
+    if (withdrawalAmount > availableBalance) {
+      return res.status(400).json({
+        message: "Insufficient available balance",
+      });
+    }
+
+    const walletBreakdown = {
+      depositWallet: 0,
+      referralWallet: 0,
+      withdrawableWallet: 0,
+    };
+
+    let remaining = withdrawalAmount;
+
+    // Deduct from withdrawable wallet first
+    if (user.withdrawableWallet >= remaining) {
+      walletBreakdown.withdrawableWallet = remaining;
+      user.withdrawableWallet -= remaining;
+      remaining = 0;
+    } else {
+      walletBreakdown.withdrawableWallet =
+        user.withdrawableWallet;
+
+      remaining -= user.withdrawableWallet;
+      user.withdrawableWallet = 0;
+    }
+
+    // Deduct from referral wallet
+    if (remaining > 0) {
+      if (user.referralWallet >= remaining) {
+        walletBreakdown.referralWallet = remaining;
+        user.referralWallet -= remaining;
+        remaining = 0;
+      } else {
+        walletBreakdown.referralWallet =
+          user.referralWallet;
+
+        remaining -= user.referralWallet;
+        user.referralWallet = 0;
+      }
+    }
+
+    // Deduct from deposit wallet
+    if (remaining > 0) {
+      walletBreakdown.depositWallet = remaining;
+      user.depositWallet -= remaining;
+      remaining = 0;
+    }
+
+    const withdrawal = await Withdrawal.create({
+      user: user._id,
+      amount: withdrawalAmount,
+      bankName,
+      accountNumber,
+      accountName,
+      walletBreakdown,
+    });
+
+    await Transaction.create({
+      user: user._id,
+      type: "withdrawal",
+      amount: withdrawalAmount,
+      description: "Withdrawal Request",
+      status: "pending",
+    });
+
+    user.totalBalance =
+      Number(user.depositWallet || 0) +
+      Number(user.referralWallet || 0) +
+      Number(user.withdrawableWallet || 0) +
+      Number(user.lockedDailyBonus || 0) +
+      Number(user.lockedProfit || 0);
+
+    await user.save();
+
+    res.status(201).json({
+      message: "Withdrawal request submitted",
+      withdrawal,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+exports.getMyWithdrawals = async (req, res) => {
+  try {
+    const withdrawals = await Withdrawal.find({
+      user: req.user.userId,
+    }).sort({
+      createdAt: -1,
+    });
+
+    res.status(200).json({
+      withdrawals,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+exports.approveWithdrawal = async (req, res) => {
+  try {
+
+    const withdrawal = await Withdrawal.findById(
+      req.params.id
+    ).populate("user");
+
+    if (!withdrawal) {
+      return res.status(404).json({
+        message: "Withdrawal not found",
+      });
+    }
+
+    if (withdrawal.status === "approved") {
+      return res.status(400).json({
+        message: "Already approved",
+      });
+    }
+
+    withdrawal.status = "approved";
+
+    await withdrawal.save();
+
+    // Replace old announcement
+    await WithdrawalAnnouncement.deleteMany({});
+
+    // Create new announcement
+    await WithdrawalAnnouncement.create({
+      fullName: withdrawal.user.fullName,
+      amount: withdrawal.amount,
+    });
+
+    await Transaction.findOneAndUpdate(
+      {
+        user: withdrawal.user._id,
+        type: "withdrawal",
+        amount: withdrawal.amount,
+        status: "pending",
+      },
+      {
+        status: "successful",
+      }
+    );
+
+    res.status(200).json({
+      message: "Withdrawal approved successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+
+  }
+};
+exports.getLatestWithdrawalAnnouncement =
+  async (req, res) => {
+    try {
+
+      const announcement =
+        await WithdrawalAnnouncement.findOne()
+        .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        announcement,
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        message: error.message,
+      });
+
+    }
+};
+
+exports.getLatestWithdrawalAnnouncement = async (req, res) => {
+  try {
+
+    const announcement =
+      await WithdrawalAnnouncement.findOne()
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      announcement,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Investments</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div class="investments-page">
+
+  <div class="page-header">
+    <a href="dashboard.html">← Back</a>
+    <h1>My Investments</h1>
+    <p>Track all your active and completed investments.</p>
+  </div>
+
+  <div class="investment-summary">
+    <div class="summary-card">
+      <p>Total Invested</p>
+      <h2 id="totalInvested">₦0</h2>
+    </div>
+
+    <div class="summary-card">
+      <p>Total Profit</p>
+      <h2 id="totalProfit">₦0</h2>
+    </div>
+
+    <div class="summary-card">
+      <p>Active Plans</p>
+      <h2 id="activePlans">0</h2>
+    </div>
+  </div>
+
+  <div id="investmentsList"></div>
+
+</div>
+
+<script>
+async function loadInvestments() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:3001/api/investments/my-investments",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+    const container = document.getElementById("investmentsList");
+
+    if (!data.investments || data.investments.length === 0) {
+      container.innerHTML = `
+        <div class="card empty-investments">
+          <img src="./images/icons/chart.svg" class="empty-icon">
+
+          <h3>No Active Investments</h3>
+
+          <p>You haven't purchased any package yet.</p>
+
+          <a href="packages.html" class="primary-btn">
+            Browse Packages
+          </a>
+        </div>
+      `;
+      return;
+    }
+
+    let totalInvested = 0;
+    let totalProfit = 0;
+    let activePlans = 0;
+
+    container.innerHTML = "";
+
+    data.investments.forEach((investment) => {
+      totalInvested += investment.amount;
+      totalProfit += investment.profitEarned || 0;
+
+      if (investment.status === "active") {
+        activePlans++;
+      }
+
+      const startDate = new Date(investment.startDate);
+      const endDate = new Date(investment.endDate);
+      const today = new Date();
+
+      const totalDays = investment.durationDays;
+
+      const daysPassed = Math.max(
+        0,
+        Math.floor((today - startDate) / (1000 * 60 * 60 * 24))
+      );
+
+      const daysRemaining = Math.max(
+        0,
+        totalDays - daysPassed
+      );
+
+      const progress = Math.min(
+        100,
+        Math.round((daysPassed / totalDays) * 100)
+      );
+
+      const statusClass =
+        investment.status === "active"
+          ? "active-status"
+          : "completed-status";
+
+      container.innerHTML += `
+        <div class="card investment-card">
+
+          <div class="investment-top">
+            <h3>${investment.packageName}</h3>
+            <span class="${statusClass}">
+              ${investment.status}
+            </span>
+          </div>
+
+          <div class="investment-grid">
+            <div>
+              <small>Amount Invested</small>
+              <h4>₦${investment.amount.toLocaleString()}</h4>
+            </div>
+
+            <div>
+              <small>Daily ROI</small>
+              <h4>${investment.dailyROI}%</h4>
+            </div>
+
+            <div>
+              <small>Duration</small>
+              <h4>${investment.durationDays} Days</h4>
+            </div>
+
+            <div>
+              <small>Profit Earned</small>
+              <h4>₦${(investment.profitEarned || 0).toLocaleString()}</h4>
+            </div>
+          </div>
+
+          <div class="investment-extra">
+            <p>
+              <strong>Start Date:</strong>
+              ${startDate.toLocaleDateString()}
+            </p>
+
+            <p>
+              <strong>End Date:</strong>
+              ${endDate.toLocaleDateString()}
+            </p>
+
+            <p>
+              <strong>Days Remaining:</strong>
+              ${daysRemaining}
+            </p>
+
+            <p>
+              <strong>Total Return:</strong>
+              ₦${investment.totalReturn.toLocaleString()}
+            </p>
+          </div>
+
+          <div class="progress-box">
+            <div class="progress-info">
+              <span>${daysPassed} / ${totalDays} Days</span>
+              <span>${progress}%</span>
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${progress}%"></div>
+            </div>
+          </div>
+
+        </div>
+      `;
+    });
+
+    document.getElementById("totalInvested").innerText =
+      `₦${totalInvested.toLocaleString()}`;
+
+    document.getElementById("totalProfit").innerText =
+      `₦${totalProfit.toLocaleString()}`;
+
+    document.getElementById("activePlans").innerText =
+      activePlans;
+
+  } catch (error) {
+    console.log(error);
+
+    document.getElementById("investmentsList").innerHTML =
+      "<p>Failed to load investments.</p>";
+  }
+}
+
+loadInvestments();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Withdraw Funds</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div class="page-container">
+
+  <div class="page-header">
+    <a href="dashboard.html">Back</a>
+    <h1>Withdraw Funds</h1>
+    <p>Request a withdrawal from your available balance.
+      Locked profits and daily bonuses cannot be withdrawn.</p>
+  </div>
+
+  <div class="withdraw-summary">
+    <div class="summary-card">
+      <p>Available Balance</p>
+      <h2>&#8358;<span id="availableBalance">0</span></h2>
+    </div>
+    <div class="summary-card">
+      <p>Pending Requests</p>
+      <h2 id="pendingWithdrawals">0</h2>
+    </div>
+  </div>
+
+  <div class="card form-card">
+    <label for="amount">Amount</label>
+    <input type="number" id="amount" min="1" placeholder="Enter amount">
+
+    <label for="bankName">Bank Name</label>
+    <input type="text" id="bankName" placeholder="Enter bank name">
+
+    <label for="accountNumber">Account Number</label>
+    <input type="text" id="accountNumber" inputmode="numeric" placeholder="Enter account number">
+
+    <label for="accountName">Account Name</label>
+    <input type="text" id="accountName" placeholder="Enter account name">
+
+    <button id="withdrawBtn" class="primary-btn">Submit Withdrawal</button>
+    <p id="message" class="form-message"></p>
+  </div>
+
+  <div class="history-card">
+    <h3>Withdrawal History</h3>
+    <div id="withdrawalHistory">
+      <p>No withdrawal requests yet.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_URL = "http://localhost:3001/api";
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
+function formatMoney(amount) {
+  return Number(amount || 0).toLocaleString();
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
+
+async function apiFetch(path, options = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "login.html";
+    return null;
+  }
+
+  return response;
+}
+
+async function loadWithdrawals() {
+  const profileRes = await apiFetch("/auth/profile", {
+    headers: {},
+  });
+  if (!profileRes) return;
+
+  const user = await profileRes.json();
+
+  const availableBalance = 
+    Number(user.depositWallet || 0) +
+    Number(user.referralWallet || 0) +
+    Number(user.withdrawableWallet || 0)
+    
+  setText("availableBalance", formatMoney(availableBalance));
+
+  const withdrawalsRes = await apiFetch("/withdrawals/my-withdrawals", {
+    headers: {},
+  });
+  if (!withdrawalsRes) return;
+
+  const data = await withdrawalsRes.json();
+  const withdrawals = data.withdrawals || [];
+  const pendingCount = withdrawals.filter((w) => w.status === "pending").length;
+  const history = document.getElementById("withdrawalHistory");
+
+  setText("pendingWithdrawals", pendingCount);
+
+  if (withdrawals.length === 0) {
+    history.innerHTML = "<p>No withdrawal requests yet.</p>";
+    return;
+  }
+
+  history.innerHTML = withdrawals
+    .map((withdrawal) => {
+      const date = new Date(withdrawal.createdAt).toLocaleDateString();
+      return `
+        <div class="transaction-history-card">
+          <div>
+            <h3>&#8358;${formatMoney(withdrawal.amount)} to ${withdrawal.bankName}</h3>
+            <p>${withdrawal.accountName} - ${withdrawal.accountNumber} - ${date}</p>
+          </div>
+          <strong class="${withdrawal.status === "rejected" ? "tx-red" : "tx-green"}">
+            ${withdrawal.status}
+          </strong>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+async function submitWithdrawal() {
+  const message = document.getElementById("message");
+  const button = document.getElementById("withdrawBtn");
+  const payload = {
+    amount: Number(document.getElementById("amount").value),
+    bankName: document.getElementById("bankName").value.trim(),
+    accountNumber: document.getElementById("accountNumber").value.trim(),
+    accountName: document.getElementById("accountName").value.trim(),
+  };
+
+  if (!payload.amount || payload.amount <= 0) {
+    message.innerText = "Enter a valid withdrawal amount.";
+    return;
+  }
+
+  if (!payload.bankName || !payload.accountNumber || !payload.accountName) {
+    message.innerText = "Fill in all bank details.";
+    return;
+  }
+
+  button.disabled = true;
+  button.innerText = "Submitting...";
+  message.innerText = "";
+
+  try {
+    const response = await apiFetch("/withdrawals", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    if (!response) return;
+
+    const data = await response.json();
+    message.innerText = data.message || "Withdrawal request submitted.";
+
+    if (response.ok) {
+      document.getElementById("amount").value = "";
+      document.getElementById("bankName").value = "";
+      document.getElementById("accountNumber").value = "";
+      document.getElementById("accountName").value = "";
+      await loadWithdrawals();
+    }
+  } catch (error) {
+    console.log(error);
+    message.innerText = "Failed to submit withdrawal.";
+  } finally {
+    button.disabled = false;
+    button.innerText = "Submit Withdrawal";
+  }
+}
+
+document.getElementById("withdrawBtn").addEventListener("click", submitWithdrawal);
+loadWithdrawals();
+</script>
+
+</body>
+</html>

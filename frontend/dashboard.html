@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BluePeak Dashboard</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+<div id="toast"></div>
+<div class="dashboard-app">
+
+  <aside class="sidebar" id="sidebar">
+    <img src="./images/logo.png" class="sidebar-logo">
+
+    <nav>
+      <a class="active" href="dashboard.html"><img src="./images/icons/dashboard.svg">Dashboard</a>
+      <a href="packages.html"><img src="./images/icons/investments.svg">Packages</a>
+      <a href="investments.html"><img src="./images/icons/chart.svg">Investments</a>
+      <a href="deposit.html"><img src="./images/icons/deposit.svg">Deposit</a>
+      <a href="withdraw.html"><img src="./images/icons/withdraw.svg">Withdraw</a>
+      <a href="transactions.html"><img src="./images/icons/transactions.svg">Transactions</a>
+      <a href="referral.html"><img src="./images/icons/share.svg">Referral</a>
+      <a href="profile.html"><img src="./images/icons/profile.svg">Profile</a>
+      <button onclick="logoutUser()"><img src="./images/icons/logout.svg">Logout</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+
+      <img src="./images/logo.png" class="mobile-logo">
+
+      <div class="top-right">
+        <div class="notification" id="notificationBell">
+          <img src="./images/icons/bell.svg">
+          <span id="notificationCount">0</span>
+        
+          <div class="notification-dropdown" id="notificationDropdown">
+            <h4>Notification</h4>
+
+            <div id="notificationList">
+              <p>No notification</p>
+            </div>
+          </div>
+        </div>
+
+        <a href="profile.html">
+          <img id="userAvatar" class="avatar">
+        </a>
+        
+      </div>
+    </header>
+
+    
+
+    <section class="welcome">
+      <p id="greeting">Good Morning 👋</p>
+      <h1 id="userName">User</h1>
+      <div id="userLevel" class="user-level">Bluepeak Starter</div>
+    </section>
+
+    <section class="dashboard-layout">
+
+      <div class="dashboard-left">
+
+        <section class="wallet-card">
+          <div>
+            <p>Total Balance</p>
+            <h2>₦<span id="totalBalance">0</span></h2>
+
+            <div class="wallet-breakdown">
+              <div>
+                <small>Deposit Wallet</small>
+                <h4>₦<span id="depositWallet">0</span></h4>
+             </div>
+
+              <div>
+                <small>Referral Wallet</small>
+                <h4>₦<span id="referralWallet">0</span></h4>
+              </div>
+
+              <div>
+                <small>Bonus</small>
+                <h4>₦<span id="lockedDailyBonus">0</span></h4>
+              </div>
+
+              <div>
+                <small>Investment Profit</small>
+                <h4>₦<span id="lockedProfit">0</span></h4>
+              </div>
+
+              <div class="available-box">
+                <small>Available Balance</small>
+                <h4>₦<span id="availableBalance">0</span></h4>
+              </div>
+            </div>
+            
+          <a href="deposit.html">+ Fund Wallet</a>  
+          </div>
+          <div class="wallet-icon">
+            <img src="./images/wallet-banner.png">
+          </div>
+          
+        </section>
+
+        <section class="level-card">
+
+          <div class="level-header">
+           <h3>🏅 Investment Level</h3>
+          <span id="userLevelCard">BluePeak Starter</span>
+          </div>
+
+          <div class="level-body">
+
+            <p>Total Invested:<strong>₦<span id="totalInvested">0</span></strong></p>
+
+            <div class="level-progress">
+              <div id="levelProgress" class="level-progress-fill"></div>
+            </div>
+
+            <small id="nextLevelText">
+               ₦10,000 required for BluePeak Pro
+            </small>
+
+          </div>
+
+        </section>
+
+        <section class="quick-actions">
+          <a href="packages.html"><img src="./images/icons/chart.svg"><span>Invest</span></a>
+          <a href="withdraw.html"><img src="./images/icons/withdraw.svg"><span>Withdraw</span></a>
+          <a href="deposit.html"><img src="./images/icons/deposit.svg"><span>Fund</span></a>
+          <a href="referral.html"><img src="./images/icons/share.svg"><span>Referral</span></a>
+          <a href="https://chat.whatsapp.com/HuZ3LxDaUh49NTYQdGDvK5?s=cl&p=a&mlu=0" target="_blank"><img src="./images/whatsapp.png"><span>WhatsApp</span></a>
+          <a href="https://t.me/+ZhxQRWeJU6w3YzQ0" target="_blank"><img src="./images/icons/telegram.svg"><span>Telegram</span></a>
+          <a href="investments.html"><img src="./images/icons/investments.svg"><span>Plans</span></a>
+          <button id="claimBonusBtn" class="primary-btn">🎁Daily Bonus</button>
+        </section>
+
+        <section class="stats-grid">
+          <div class="card stat-card">
+            <p>Portfolio Growth</p>
+            <h2>₦<span id="profitWallet"></span></h2>
+            <small><span id="activePlansCount">10%</span></small>
+            <div class="growth-stats">
+              <div>
+                <span>Total ROI</span>
+                <strong>10% Daily</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <p>Referral Earnings</p>
+            <h2>₦<span id="bonusWallet">0</span></h2>
+            <small>30% referral bonus</small>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h3>Active Investments</h3>
+            <a href="investments.html">View all</a>
+          </div>
+
+          <div class="empty-investment">
+            <div>♻️</div>
+            <p>No active investment yet</p>
+            <a href="packages.html">Start Investing</a>
+          </div>
+        </section>
+
+      </div>
+
+      <section class="card latest-withdrawal-card">
+
+        <div class="section-title">
+          <h3>🎉 Latest Withdrawal</h3>
+        </div>
+
+       <div id="latestWithdrawal">
+          <p>No withdrawals yet.</p>
+          </div>
+
+      </section>
+
+      <div class="dashboard-right">
+
+        <section class="card">
+          <div class="section-title">
+            <h3>Popular Packages</h3>
+            <a href="packages.html">View all</a>
+          </div>
+
+          <div class="package-small">
+            <img src="./images/packages/breeze.jpg">
+            <div>
+              <h4>BluePeak Breeze</h4>
+              <p>₦3,000 • 10% Daily</p>
+            </div>
+          </div>
+
+          <div class="package-small">
+            <img src="./images/packages/wave.jpg">
+            <div>
+              <h4>BluePeak Wave</h4>
+              <p>₦10,000 • 10% Daily</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h3>Transaction History</h3>
+            <a href="transactions.html">View all</a>
+          </div>
+
+          <div class="transaction">
+            <img src="./images/icons/gift.svg">
+            <div>
+              <h4>Welcome Bonus</h4>
+              <p>Registration reward</p>
+            </div>
+            <strong>+₦1,500</strong>
+          </div>
+
+          <div class="transaction">
+            <img src="./images/icons/pending.png">
+            <div>
+              <h4>Investment Status</h4>
+              <p>No active investment</p>
+            </div>
+            <strong class="gray-text">₦0</strong>
+          </div>
+        </section>
+
+        <section class="card referral-box">
+          <h3>Your Referral Code</h3>
+          <div>
+            <span id="referralCode">CODE</span>
+            <button onclick="copyReferral()">Copy</button>
+          </div>
+        </section>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <a class="active" href="dashboard.html"><img src="./images/icons/dashboard.svg"><span>Home</span></a>
+    <a href="packages.html"><img src="./images/icons/chart.svg"><span>Invest</span></a>
+    <a href="deposit.html"><img src="./images/icons/wallet.svg"><span>Wallet</span></a>
+    <a href="referral.html"><img src="./images/icons/share.svg"><span>Referral</span></a>
+    <a href="profile.html"><img src="./images/icons/profile.svg"><span>Profile</span></a>
+  </nav>
+
+</div>
+
+<div id="welcomeModal" class="welcome-modal">
+
+  <div class="welcome-modal-content">
+
+    <img
+      src="./images/logo.png"
+      class="welcome-logo"
+    >
+
+    <h2>
+      👋 Welcome to
+      <span>BluePeak Investment</span>
+    </h2>
+
+    <p>
+      BluePeak Investment was established in 2023 to help people grow their money through simple and secure digital investments.
+    </p>
+
+    <div class="info-item">
+      <i>📈</i>
+      <p>
+        All investment packages earn
+        <strong>10% daily ROI for 90 days (3 months)</strong>.
+      </p>
+    </div>
+
+    <div class="info-item">
+      <i>💰</i>
+      <p>
+        Referral rewards can be invested or withdrawn.
+      </p>
+    </div>
+
+    <div class="info-item">
+      <i>🔒</i>
+      <p>
+        Investment profits remain locked until package maturity.
+      </p>
+    </div>
+
+    <div class="level-title">
+      🏆 BluePeak Levels
+    </div>
+
+    <div class="level-list">
+
+      <div class="level-item">
+        <span>🥉 Starter</span>
+        <span>₦0 - ₦9,999</span>
+      </div>
+
+      <div class="level-item">
+        <span>🥈 Pro</span>
+        <span>₦10,000 - ₦49,999</span>
+      </div>
+
+      <div class="level-item">
+        <span>🥇 Elite</span>
+        <span>₦50,000 - ₦199,999</span>
+      </div>
+
+      <div class="level-item">
+        <span>💎 Prime</span>
+        <span>₦200,000 - ₦999,999</span>
+      </div>
+
+      <div class="level-item">
+        <span>👑 Legend</span>
+        <span>₦1,000,000+</span>
+      </div>
+
+    </div>
+
+    <div class="welcome-footer">
+      BluePeak — Building Wealth, Reaching New Heights.
+    </div>
+
+    <button
+      class="welcome-btn"
+      onclick="closeWelcomeModal()"
+    >
+      Got It
+    </button>
+
+  </div>
+
+</div>
+
+<script src="./js/main.js"></script>
+</body>
+</html>

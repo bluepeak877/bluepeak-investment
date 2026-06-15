@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BluePeak Packages</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+
+  
+<div id="toast"></div>
+<main class="packages-page">
+
+  <div class="packages-header">
+    <a href="dashboard.html">← Back</a>
+    <h1>Investment Packages</h1>
+    <p>Choose a BluePeak plan and earn 10% daily ROI for 90 days.</p>
+  </div>
+
+  <section class="packages-grid">
+
+    <div class="plan-card">
+      <img src="./images/packages/breeze.jpg">
+      <span class="badge">Starter</span>
+      <h2>BluePeak Breeze</h2>
+      <p>Amount to Invest</p>
+      <h3>₦3,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦30,000</li>
+      </ul>
+      <button onclick="openConfirmModal('breeze')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/wave.jpg">
+      <span class="badge">Basic</span>
+      <h2>BluePeak Wave</h2>
+      <p>Amount to Invest</p>
+      <h3>₦10,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦100,000</li>
+      </ul>
+      <button onclick="openConfirmModal('wave')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/horizon.jpg">
+      <span class="badge popular">Popular</span>
+      <h2>BluePeak Horizon</h2>
+      <p>Amount to Invest</p>
+      <h3>₦30,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦300,000</li>
+      </ul>
+      <button onclick="openConfirmModal('horizon')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/summit.jpg">
+      <span class="badge">Growth</span>
+      <h2>BluePeak Summit</h2>
+      <p>Amount to Invest</p>
+      <h3>₦60,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦600,000</li>
+      </ul>
+      <button onclick="openConfirmModal('summit')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/infinity.jpg">
+      <span class="badge vip">VIP</span>
+      <h2>BluePeak Infinity</h2>
+      <p>Amount to Invest</p>
+      <h3>₦100,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦1,000,000</li>
+      </ul>
+      <button onclick="openConfirmModal('infinity')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/elite.jpg">
+      <span class="badge vip">Elite</span>
+      <h2>BluePeak Elite</h2>
+      <p>Amount to Invest</p>
+      <h3>₦200,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦2,000,000</li>
+      </ul>
+      <button onclick="openConfirmModal('elite')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/prime.jpg">
+      <span class="badge vip">Prime</span>
+      <h2>BluePeak Prime</h2>
+      <p>Amount to Invest</p>
+      <h3>₦500,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦5,000,000</li>
+      </ul>
+      <button onclick="openConfirmModal('prime')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/royal.jpg">
+      <span class="badge vip">Royal</span>
+      <h2>BluePeak Royal</h2>
+      <p>Amount to Invest</p>
+      <h3>₦1,000,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦10,000,000</li>
+      </ul>
+      <button onclick="openConfirmModal('royal')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/platinum.jpg">
+      <span class="badge vip">Platinum</span>
+      <h2>BluePeak Platinum</h2>
+      <p>Amount to Invest</p>
+      <h3>₦2,000,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦20,000,000</li>
+      </ul>
+      <button onclick="openConfirmModal('platinum')">Invest Now</button>
+    </div>
+
+    <div class="plan-card">
+      <img src="./images/packages/diamond.jpg">
+      <span class="badge vip">Diamond</span>
+      <h2>BluePeak Diamond</h2>
+      <p>Amount to Invest</p>
+      <h3>₦5,000,000</h3>
+      <ul>
+        <li>Daily ROI: 10%</li>
+        <li>Duration: 90 Days</li>
+        <li>Total Return: ₦50,000,000</li>
+      </ul>
+      <button onclick="openConfirmModal('diamond')">Invest Now</button>
+    </div>
+
+  </section>
+
+</main>
+<div id="confirmModal" class="confirm-modal">
+  <div class="confirm-box">
+
+    <h3>Confirm Investment</h3>
+
+    <p>
+      Are you sure you want to invest in this package?
+    </p>
+
+    <div class="confirm-actions">
+
+      <button
+        class="cancel-btn"
+        onclick="closeConfirmModal()">
+        Cancel
+      </button>
+
+      <button
+        class="confirm-btn"
+        id="confirmPurchaseBtn">
+        Confirm
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+let selectedPackage = null;
+
+function showToast(message, type = "success") {
+
+  const toast = document.getElementById("toast");
+
+  if (!toast) return;
+
+  toast.innerText = message;
+
+  toast.className = "";
+
+  toast.classList.add("show");
+  toast.classList.add(type);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
+
+function openConfirmModal(packageKey) {
+
+  selectedPackage = packageKey;
+
+  document
+    .getElementById("confirmModal")
+    .classList.add("show");
+}
+
+function closeConfirmModal() {
+
+  document
+    .getElementById("confirmModal")
+    .classList.remove("show");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  document
+    .getElementById("confirmPurchaseBtn")
+    .addEventListener("click", () => {
+
+      closeConfirmModal();
+
+      buyPackage(selectedPackage);
+    });
+
+});
+
+async function buyPackage(packageKey) {
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+
+    showToast(
+      "Please login first",
+      "warning"
+    );
+
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1000);
+
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      "http://localhost:3001/api/investments/buy",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ packageKey })
+      }
+    );
+
+    const data = await response.json();
+
+    showToast(
+      data.message,
+      response.ok ? "success" : "error"
+    );
+
+    if (response.ok) {
+
+      setTimeout(() => {
+        window.location.href =
+          "investments.html";
+      }, 2500);
+
+    }
+
+  } catch (error) {
+
+    console.log(error);
+
+    showToast(
+      "Something went wrong. Please try again.",
+      "error"
+    );
+  }
+}
+
+</script>
+
+
+</body>
+</html>

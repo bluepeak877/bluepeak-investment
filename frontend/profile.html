@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BluePeak Profile</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div class="page-container">
+
+  <div class="page-header">
+    <a href="dashboard.html">← Back</a>
+    <h1>My Profile</h1>
+    <p>View your account information and wallet summary.</p>
+  </div>
+
+  <div class="profile-card">
+    <img src="./images/default-avatar.png" class="profile-avatar">
+
+    <h2 id="profileName">Loading...</h2>
+    <p id="profileEmail">Loading...</p>
+
+    <span class="profile-status" id="profileStatus">Active</span>
+  </div>
+
+  <div class="profile-grid">
+    <div class="profile-info">
+      <small>Full Name</small>
+      <h4 id="fullName">Loading...</h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Email</small>
+      <h4 id="email">Loading...</h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Phone</small>
+      <h4 id="phone">Loading...</h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Referral Code</small>
+      <h4 id="referralCode">Loading...</h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Deposit Wallet</small>
+      <h4>₦<span id="depositWallet">0</span></h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Referral Wallet</small>
+      <h4>₦<span id="referralWallet">0</span></h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Daily Bonus</small>
+      <h4>₦<span id="lockedDailyBonus">0</span></h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Investment Profit</small>
+      <h4>₦<span id="lockedProfit">0</span></h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Available Balance</small>
+      <h4>₦<span id="availableBalance">0</span></h4>
+    </div>
+
+    <div class="profile-info">
+      <small>Total Balance</small>
+      <h4>₦<span id="totalBalance">0</span></h4>
+    </div>
+  </div>
+
+  <button class="primary-btn" onclick="logoutUser()">Logout</button>
+
+</div>
+
+<script>
+const API_URL = "http://localhost:3001/api";
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
+function formatMoney(amount) {
+  return Number(amount || 0).toLocaleString();
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
+
+async function loadProfile() {
+  try {
+    const response = await fetch(`${API_URL}/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const user = await response.json();
+
+    const availableBalance =
+      (user.depositWallet || 0) +
+      (user.referralWallet || 0) +
+      (user.withdrawableWallet || 0);
+
+    setText("profileName", user.fullName);
+    setText("profileEmail", user.email);
+
+    setText("fullName", user.fullName);
+    setText("email", user.email);
+    setText("phone", user.phone);
+    setText("referralCode", user.referralCode);
+
+    setText("depositWallet", formatMoney(user.depositWallet));
+    setText("referralWallet", formatMoney(user.referralWallet));
+    setText("lockedDailyBonus", formatMoney(user.lockedDailyBonus));
+    setText("lockedProfit", formatMoney(user.lockedProfit));
+    setText("availableBalance", formatMoney(availableBalance));
+    setText("totalBalance", formatMoney(user.totalBalance));
+
+    if (user.isSuspended) {
+      setText("profileStatus", "Suspended");
+      document.getElementById("profileStatus").classList.add("suspended");
+    }
+
+  } catch (error) {
+    console.log(error);
+    alert("Failed to load profile");
+  }
+}
+
+function logoutUser() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

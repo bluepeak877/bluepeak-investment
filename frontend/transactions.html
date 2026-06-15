@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction History</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div class="transactions-page">
+
+  <div class="page-header">
+    <a href="dashboard.html">← Back</a>
+    <h1>Transaction History</h1>
+    <p>View your deposits, investments, profits, referrals and withdrawals.</p>
+  </div>
+
+  <div class="transaction-summary">
+    <div class="summary-card">
+      <p>Total Transactions</p>
+      <h2 id="totalTransactions">0</h2>
+    </div>
+
+    <div class="summary-card">
+      <p>Total Investment</p>
+      <h2 id="totalInvestment">₦0</h2>
+    </div>
+
+    <div class="summary-card">
+      <p>Total Referral</p>
+      <h2 id="totalReferral">₦0</h2>
+    </div>
+  </div>
+
+  <div id="transactionsList"></div>
+
+</div>
+
+<script>
+async function loadTransactions() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://localhost:3001/api/transactions/my-transactions",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+    const container = document.getElementById("transactionsList");
+
+    const transactions = data.transactions || [];
+
+    if (transactions.length === 0) {
+      container.innerHTML = `
+        <div class="card empty-investments">
+          <h3>No Transactions Yet</h3>
+          <p>Your transaction history will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let totalInvestment = 0;
+    let totalReferral = 0;
+
+    container.innerHTML = "";
+
+    transactions.forEach((tx) => {
+      if (tx.type === "investment") totalInvestment += tx.amount;
+      if (tx.type === "referral") totalReferral += tx.amount;
+
+      const date = new Date(tx.createdAt).toLocaleDateString();
+
+      let sign = "+";
+      let amountClass = "tx-green";
+
+      if (tx.type === "investment" || tx.type === "withdrawal") {
+        sign = "-";
+        amountClass = "tx-red";
+      }
+
+      container.innerHTML += `
+        <div class="card transaction-history-card">
+          <div class="tx-left">
+            <div class="tx-icon-circle">
+              ${tx.type === "investment" ? "📦" : ""}
+              ${tx.type === "deposit" ? "💳" : ""}
+              ${tx.type === "withdrawal" ? "💸" : ""}
+              ${tx.type === "profit" ? "📈" : ""}
+              ${tx.type === "referral" ? "🎁" : ""}
+              ${tx.type === "bonus" ? "🎉" : ""}
+            </div>
+
+            <div>
+              <h3>${tx.description}</h3>
+              <p>${tx.type} • ${tx.status} • ${date}</p>
+            </div>
+          </div>
+
+          <strong class="${amountClass}">
+            ${sign}₦${tx.amount.toLocaleString()}
+          </strong>
+        </div>
+      `;
+    });
+
+    document.getElementById("totalTransactions").innerText =
+      transactions.length;
+
+    document.getElementById("totalInvestment").innerText =
+      `₦${totalInvestment.toLocaleString()}`;
+
+    document.getElementById("totalReferral").innerText =
+      `₦${totalReferral.toLocaleString()}`;
+
+  } catch (error) {
+    console.log(error);
+
+    document.getElementById("transactionsList").innerHTML =
+      "<p>Failed to load transactions.</p>";
+  }
+}
+
+loadTransactions();
+</script>
+
+</body>
+</html>

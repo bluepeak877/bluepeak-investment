@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BluePeak Admin</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <header class="admin-topbar">
+    <div>
+      <a href="dashboard.html" class="admin-back">Back to App</a>
+      <h1>Admin Dashboard</h1>
+      <p>Monitor users, balances, investments, transactions, and withdrawals.</p>
+    </div>
+
+    <div class="admin-toolbar">
+      <button id="refreshBtn" class="primary-btn">Refresh</button>
+      <button class="secondary-btn" onclick="logoutAdmin()">Logout</button>
+    </div>
+  </header>
+
+  <section class="admin-kpis">
+    <div class="summary-card">
+      <p>Total Users</p>
+      <h2 id="totalUsers">0</h2>
+      <small><span id="activeUsers">0</span> active</small>
+    </div>
+
+    <div class="summary-card">
+      <p>Suspended Users</p>
+      <h2 id="suspendedUsers">0</h2>
+      <small>Account control</small>
+    </div>
+
+    <div class="summary-card">
+      <p>Pending Withdrawals</p>
+      <h2 id="pendingWithdrawals">0</h2>
+      <small>Needs review</small>
+    </div>
+
+    <div class="summary-card">
+      <p>Total Deposits</p>
+      <h2>&#8358;<span id="totalDeposits">0</span></h2>
+      <small>Successful funding</small>
+    </div>
+
+    <div class="summary-card">
+      <p>Total Invested</p>
+      <h2>&#8358;<span id="totalInvested">0</span></h2>
+      <small><span id="activeInvestments">0</span> active plans</small>
+    </div>
+
+    <div class="summary-card">
+      <p>User Balances</p>
+      <h2>&#8358;<span id="totalUserBalances">0</span></h2>
+      <small>Across all wallets</small>
+    </div>
+  </section>
+
+  <section class="admin-grid">
+    <div class="admin-main">
+      <section class="admin-panel">
+        <div class="admin-panel-head">
+          <div>
+            <h2>Withdrawal Queue</h2>
+            <p>Approve paid requests or reject and refund the user wallet.</p>
+          </div>
+          <select id="withdrawalFilter">
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div id="withdrawalsList" class="admin-list">
+          <p>Loading withdrawals...</p>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <div class="admin-panel-head">
+          <div>
+            <h2>User Management</h2>
+            <p>Search users and suspend or restore access.</p>
+          </div>
+          <input id="userSearch" class="admin-search" type="search" placeholder="Search name, email, phone">
+        </div>
+        <div id="usersList" class="admin-list">
+          <p>Loading users...</p>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <div class="admin-panel-head">
+          <div>
+            <h2>Wallet Adjustment</h2>
+            <p>Credit or debit a user's wallet with an audit transaction.</p>
+          </div>
+        </div>
+
+        <div class="admin-form-grid">
+          <label>
+            User
+            <select id="adjustUser"></select>
+          </label>
+
+          <label>
+            Wallet
+            <select id="adjustWallet">
+              <option value="depositWallet">Deposit Wallet</option>
+              <option value="referralWallet">Referral Wallet</option>
+              <option value="withdrawableWallet">Withdrawable Wallet</option>
+            </select>
+          </label>
+
+          <label>
+            Action
+            <select id="adjustAction">
+              <option value="credit">Credit</option>
+              <option value="debit">Debit</option>
+            </select>
+          </label>
+
+          <label>
+            Amount
+            <input id="adjustAmount" type="number" min="1" placeholder="Enter amount">
+          </label>
+
+          <label class="wide-field">
+            Description
+            <input id="adjustDescription" type="text" placeholder="Reason for adjustment">
+          </label>
+        </div>
+
+        <button id="adjustWalletBtn" class="primary-btn admin-submit-btn">Apply Wallet Adjustment</button>
+        <p id="adjustMessage" class="form-message"></p>
+      </section>
+    </div>
+
+    <aside class="admin-side">
+      <section class="admin-panel">
+        <div class="admin-panel-head compact-head">
+          <h2>Recent Transactions</h2>
+          <select id="transactionFilter">
+            <option value="all">All</option>
+            <option value="deposit">Deposits</option>
+            <option value="withdrawal">Withdrawals</option>
+            <option value="investment">Investments</option>
+            <option value="referral">Referrals</option>
+            <option value="bonus">Bonuses</option>
+            <option value="adjustment">Adjustments</option>
+          </select>
+        </div>
+        <div id="transactionsList" class="compact-list">
+          <p>Loading transactions...</p>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <h2>Recent Investments</h2>
+        <div id="investmentsList" class="compact-list">
+          <p>Loading investments...</p>
+        </div>
+      </section>
+    </aside>
+  </section>
+</div>
+
+<script>
+const API_URL = "http://localhost:3001/api";
+const token = localStorage.getItem("token");
+const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+let adminState = {
+  users: [],
+  withdrawals: [],
+  transactions: [],
+  investments: [],
+};
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
+if (!savedUser.isAdmin) {
+  alert("Admin access required");
+  window.location.href = "dashboard.html";
+}
+
+function formatMoney(amount) {
+  return Number(amount || 0).toLocaleString();
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
+
+function statusClass(status) {
+  if (status === "approved" || status === "successful" || status === "active") {
+    return "status-good";
+  }
+
+  if (status === "rejected" || status === "failed" || status === "suspended") {
+    return "status-bad";
+  }
+
+  return "status-warn";
+}
+
+async function adminFetch(path, options = {}) {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.status === 401 || response.status === 403) {
+    alert("Admin session expired or unauthorized");
+    window.location.href = "login.html";
+    return null;
+  }
+
+  return response;
+}
+
+async function loadAdminOverview() {
+  const refreshBtn = document.getElementById("refreshBtn");
+  refreshBtn.disabled = true;
+  refreshBtn.innerText = "Refreshing...";
+
+  try {
+    const response = await adminFetch("/admin/overview");
+    if (!response) return;
+
+    const data = await response.json();
+    const stats = data.stats || {};
+
+    adminState = {
+      users: data.users || [],
+      withdrawals: data.withdrawals || [],
+      transactions: data.transactions || [],
+      investments: data.investments || [],
+    };
+
+    setText("totalUsers", stats.totalUsers || 0);
+    setText("activeUsers", stats.activeUsers || 0);
+    setText("suspendedUsers", stats.suspendedUsers || 0);
+    setText("pendingWithdrawals", stats.pendingWithdrawals || 0);
+    setText("totalDeposits", formatMoney(stats.totalDeposits));
+    setText("totalInvested", formatMoney(stats.totalInvested));
+    setText("activeInvestments", stats.activeInvestments || 0);
+    setText("totalUserBalances", formatMoney(stats.totalUserBalances));
+
+    renderWithdrawals();
+    renderUsers();
+    renderAdjustUserOptions();
+    renderTransactions();
+    renderInvestments();
+  } catch (error) {
+    console.log(error);
+    document.getElementById("withdrawalsList").innerHTML =
+      "<p>Failed to load admin dashboard.</p>";
+  } finally {
+    refreshBtn.disabled = false;
+    refreshBtn.innerText = "Refresh";
+  }
+}
+
+function renderWithdrawals() {
+  const list = document.getElementById("withdrawalsList");
+  const filter = document.getElementById("withdrawalFilter").value;
+  const withdrawals = adminState.withdrawals.filter(
+    (withdrawal) => filter === "all" || withdrawal.status === filter
+  );
+
+  if (withdrawals.length === 0) {
+    list.innerHTML = "<p>No withdrawal requests in this view.</p>";
+    return;
+  }
+
+  list.innerHTML = withdrawals
+    .map((withdrawal) => {
+      const user = withdrawal.user || {};
+      const date = new Date(withdrawal.createdAt).toLocaleDateString();
+      const actions =
+        withdrawal.status === "pending"
+          ? `
+            <div class="admin-actions">
+              <button onclick="reviewWithdrawal('${withdrawal._id}', 'approved')">Approve</button>
+              <button class="danger-btn" onclick="reviewWithdrawal('${withdrawal._id}', 'rejected')">Reject</button>
+            </div>
+          `
+          : `<span class="status-pill ${statusClass(withdrawal.status)}">${withdrawal.status}</span>`;
+
+      return `
+        <article class="admin-row">
+          <div>
+            <h3>&#8358;${formatMoney(withdrawal.amount)} - ${withdrawal.bankName}</h3>
+            <p>${withdrawal.accountName} - ${withdrawal.accountNumber}</p>
+            <p>${user.fullName || "Unknown user"} - ${user.email || ""} - ${date}</p>
+          </div>
+          ${actions}
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderUsers() {
+  const list = document.getElementById("usersList");
+  const search = document.getElementById("userSearch").value.trim().toLowerCase();
+  const users = adminState.users.filter((user) => {
+    const haystack = `${user.fullName} ${user.email} ${user.phone} ${user.referralCode}`.toLowerCase();
+    return haystack.includes(search);
+  });
+
+  if (users.length === 0) {
+    list.innerHTML = "<p>No users match your search.</p>";
+    return;
+  }
+
+  list.innerHTML = users
+    .map((user) => {
+      const accountStatus = user.isSuspended ? "suspended" : "active";
+      const nextSuspendedValue = user.isSuspended ? "false" : "true";
+      const buttonLabel = user.isSuspended ? "Restore" : "Suspend";
+
+      return `
+        <article class="admin-row">
+          <div>
+            <h3>${user.fullName}</h3>
+            <p>${user.email} - ${user.phone}</p>
+            <p>Balance: &#8358;${formatMoney(user.totalBalance)} - Referral: ${user.referralCode || "None"}</p>
+          </div>
+          <div class="admin-actions stacked">
+            <span class="status-pill ${statusClass(accountStatus)}">${accountStatus}</span>
+            <button class="${user.isSuspended ? "" : "danger-btn"}" onclick="toggleUserStatus('${user._id}', ${nextSuspendedValue})">
+              ${buttonLabel}
+            </button>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderTransactions() {
+  const list = document.getElementById("transactionsList");
+  const filter = document.getElementById("transactionFilter").value;
+  const transactions = adminState.transactions.filter(
+    (tx) => filter === "all" || tx.type === filter
+  );
+
+  if (transactions.length === 0) {
+    list.innerHTML = "<p>No transactions yet.</p>";
+    return;
+  }
+
+  list.innerHTML = transactions
+    .slice(0, 10)
+    .map((tx) => {
+      const user = tx.user || {};
+      const date = new Date(tx.createdAt).toLocaleDateString();
+      return `
+        <div class="compact-item">
+          <div>
+            <strong>${tx.type}</strong>
+            <p>${tx.description}</p>
+            <small>${user.fullName || "Unknown user"} - ${date}</small>
+          </div>
+          <span class="${tx.type === "withdrawal" ? "amount-negative" : ""}">&#8358;${formatMoney(tx.amount)}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderInvestments() {
+  const list = document.getElementById("investmentsList");
+
+  if (adminState.investments.length === 0) {
+    list.innerHTML = "<p>No investments yet.</p>";
+    return;
+  }
+
+  list.innerHTML = adminState.investments
+    .slice(0, 10)
+    .map((investment) => {
+      const user = investment.user || {};
+      return `
+        <div class="compact-item">
+          <div>
+            <strong>${investment.packageName}</strong>
+            <p>${investment.status} - ${investment.dailyROI}% daily</p>
+            <small>${user.fullName || "Unknown user"} - Ends ${new Date(investment.endDate).toLocaleDateString()}</small>
+          </div>
+          <span>&#8358;${formatMoney(investment.amount)}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+async function reviewWithdrawal(id, status) {
+  const confirmed = confirm(`Mark this withdrawal as ${status}?`);
+  if (!confirmed) return;
+  const adminNote = prompt("Optional admin note", "") || "";
+
+  const response = await adminFetch(`/admin/withdrawals/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status, adminNote }),
+  });
+  if (!response) return;
+
+  const data = await response.json();
+  alert(data.message);
+
+  if (response.ok) loadAdminOverview();
+}
+
+async function toggleUserStatus(id, isSuspended) {
+  const action = isSuspended ? "suspend" : "restore";
+  const confirmed = confirm(`Are you sure you want to ${action} this user?`);
+  if (!confirmed) return;
+
+  const response = await adminFetch(`/admin/users/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ isSuspended }),
+  });
+  if (!response) return;
+
+  const data = await response.json();
+  alert(data.message);
+
+  if (response.ok) loadAdminOverview();
+}
+
+function renderAdjustUserOptions() {
+  const select = document.getElementById("adjustUser");
+  const selectedValue = select.value;
+
+  select.innerHTML = adminState.users
+    .map((user) => `
+      <option value="${user._id}">
+        ${user.fullName} - ${user.email}
+      </option>
+    `)
+    .join("");
+
+  if (selectedValue) {
+    select.value = selectedValue;
+  }
+}
+
+async function applyWalletAdjustment() {
+  const button = document.getElementById("adjustWalletBtn");
+  const message = document.getElementById("adjustMessage");
+  const userId = document.getElementById("adjustUser").value;
+  const payload = {
+    walletType: document.getElementById("adjustWallet").value,
+    action: document.getElementById("adjustAction").value,
+    amount: Number(document.getElementById("adjustAmount").value),
+    description: document.getElementById("adjustDescription").value.trim(),
+  };
+
+  if (!userId) {
+    message.innerText = "Select a user.";
+    return;
+  }
+
+  if (!payload.amount || payload.amount <= 0) {
+    message.innerText = "Enter a valid amount.";
+    return;
+  }
+
+  const confirmed = confirm(
+    `${payload.action} NGN ${formatMoney(payload.amount)} on this user's wallet?`
+  );
+  if (!confirmed) return;
+
+  button.disabled = true;
+  button.innerText = "Applying...";
+  message.innerText = "";
+
+  try {
+    const response = await adminFetch(`/admin/users/${userId}/wallet`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+    if (!response) return;
+
+    const data = await response.json();
+    message.innerText = data.message;
+
+    if (response.ok) {
+      document.getElementById("adjustAmount").value = "";
+      document.getElementById("adjustDescription").value = "";
+      loadAdminOverview();
+    }
+  } catch (error) {
+    console.log(error);
+    message.innerText = "Failed to apply wallet adjustment.";
+  } finally {
+    button.disabled = false;
+    button.innerText = "Apply Wallet Adjustment";
+  }
+}
+
+function logoutAdmin() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "login.html";
+}
+
+document.getElementById("refreshBtn").addEventListener("click", loadAdminOverview);
+document.getElementById("withdrawalFilter").addEventListener("change", renderWithdrawals);
+document.getElementById("userSearch").addEventListener("input", renderUsers);
+document.getElementById("transactionFilter").addEventListener("change", renderTransactions);
+document.getElementById("adjustWalletBtn").addEventListener("click", applyWalletAdjustment);
+
+loadAdminOverview();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Referral Dashboard</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div class="page-container">
+
+  <div class="page-header">
+    <a href="dashboard.html">← Back</a>
+
+    <h1>Referral Dashboard</h1>
+
+    <div class="referral-badge">
+      🎁 Earn 30% Commission
+    </div>
+
+    <p class="ref-subtitle">
+      Earn rewards whenever your referrals purchase an investment package.
+    </p>
+  </div>
+
+  <div class="referral-banner">
+
+    <div class="ref-block">
+      <h3>Your Referral Code</h3>
+
+      <div class="referral-box">
+        <span id="referralCode">Loading...</span>
+        <button onclick="copyCode()">Copy</button>
+       </div>
+    </div>
+
+    <div class="ref-block">
+      <h3>Your Referral Link</h3>
+
+      <div class="referral-box">
+        <span id="referralLink">Loading...</span>
+        <button onclick="copyLink()">Copy</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="share-section">
+
+    <a
+      id="shareWhatsapp"
+      class="share-btn whatsapp"
+      target="_blank"
+    >
+      WhatsApp
+    </a>
+
+    <a
+      id="shareTelegram"
+      class="share-btn telegram"
+      target="_blank"
+    >
+      Telegram
+    </a>
+
+  </div>
+
+  <div class="referral-stats">
+
+    <div class="ref-stat-card">
+      <div class="stat-icon">👥</div>
+
+      <p>Total Referrals</p>
+
+      <h2 id="totalReferrals">0</h2>
+    </div>
+
+  <div class="ref-stat-card">
+    <div class="stat-icon">💰</div>
+
+    <p>Referral Earnings</p>
+
+    <h2>₦<span id="referralWallet">0</span></h2>
+  </div>
+
+</div>
+
+<div class="referral-info-card">
+  <h3>🎁 Referral Rewards</h3>
+
+  <p>
+    Earn <strong>30%</strong> commission whenever a
+    referral purchases an investment package.
+  </p>
+</div>
+
+<div class="history-card">
+
+  <h3>Referral History</h3>
+
+  <div id="referralHistory">
+    <p>No referral earnings yet.</p>
+  </div>
+
+</div>
+</div>
+
+<script src="./js/referral.js"></script>
+</body>
+</html>

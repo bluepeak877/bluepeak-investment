@@ -19,7 +19,7 @@ fundBtn.addEventListener("click", async () => {
     fundBtn.innerText = "Processing...";
 
     const response = await fetch(
-      "http://localhost:3001/api/payments/initialize",
+      "https://bluepeak-api-ooxc.onrender.com/api/payments/initialize",
       {
         method: "POST",
         headers: {

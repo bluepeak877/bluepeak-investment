@@ -48,7 +48,7 @@ async function loadInvestments() {
 
   try {
     const response = await fetch(
-      "https://bluepeak-api-ooxc.onrender.com/api/investments/my-investment",
+      "https://bluepeak-api-ooxc.onrender.com/api/investments/my-investments",
       {
         method: "GET",
         headers: {
@@ -56,6 +56,17 @@ async function loadInvestments() {
         }
       }
     );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      console.error("Status:", response.status);
+      console.error("Response:", errorText);
+
+      throw new Error(
+       `API Error ${response.status}`
+      );
+    }
 
     const data = await response.json();
     const container = document.getElementById("investmentsList");
@@ -196,10 +207,15 @@ async function loadInvestments() {
       activePlans;
 
   } catch (error) {
-    console.log(error);
 
-    document.getElementById("investmentsList").innerHTML =
-      "<p>Failed to load investments.</p>";
+    console.error(error);
+
+     document.getElementById("investmentsList").innerHTML = `
+      <div class="card empty-investments">
+        <h3>Unable to Load Investments</h3>
+        <p>${error.message}</p>
+    </div>
+    `;
   }
 }
 

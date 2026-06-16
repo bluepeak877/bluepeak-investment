@@ -282,4 +282,4 @@ exports.getMyInvestments = async (req, res) => {
       error: error.message,
     });
   }
-};
+}

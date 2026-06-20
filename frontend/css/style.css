@@ -2635,3 +2635,23 @@ body{
   }
 
 }
+
+.generated-account-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #0f172a;
+  color: white;
+}
+
+.generated-account-card h3 {
+  margin-bottom: 15px;
+}
+
+.generated-account-card p {
+  margin: 10px 0;
+}
+
+.generated-account-card strong {
+  color: #38bdf8;
+}

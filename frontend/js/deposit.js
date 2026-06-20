@@ -16,7 +16,7 @@ fundBtn.addEventListener("click", async () => {
   try {
 
     fundBtn.disabled = true;
-    fundBtn.innerText = "Processing...";
+    fundBtn.innerText = "Generating Account...";
 
     const response = await fetch(
       "https://bluepeak-api-ooxc.onrender.com/api/payments/initialize",
@@ -34,32 +34,61 @@ fundBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    console.log(data);
+    console.log(data.responseBody);
 
     if (response.ok && data.requestSuccessful) {
 
-      localStorage.setItem(
-        "paymentReference",
-        data.responseBody.paymentReference
-      );
+      const account = data.responseBody;
 
-      localStorage.setItem(
-        "transactionReference",
-        data.responseBody.transactionReference
-      );
+      if (!account) {
+        message.innerText =
+          "Account generation failed";
+        return;
+      }
 
-      window.location.href =
-        data.responseBody.checkoutUrl;
+      document.getElementById("generatedAccount").innerHTML = `
+        <div class="generated-account-card">
+
+          <h3>Transfer Payment</h3>
+
+          <p>
+            <strong>Bank:</strong>
+            ${account.account_bank}
+          </p>
+
+          <p>
+            <strong>Account Name:</strong>
+            ${account.account_name}
+          </p>
+
+          <p>
+            <strong>Account Number:</strong>
+            ${account.account_number}
+          </p>
+
+          <p>
+            <strong>Amount:</strong>
+            ₦${Number(amount).toLocaleString()}
+          </p>
+
+          <small>
+            Transfer the exact amount above.
+            Your wallet will be funded automatically
+            after payment confirmation.
+          </small>
+
+        </div>
+      `;
+
+      message.innerText =
+        "Account generated successfully";
 
     } else {
 
       message.innerText =
         data.message ||
-        data.responseMessage ||
-        "Payment initialization failed";
+        "Failed to generate account";
 
-      fundBtn.disabled = false;
-      fundBtn.innerText = "Fund Wallet";
     }
 
   } catch (error) {
@@ -69,8 +98,11 @@ fundBtn.addEventListener("click", async () => {
     message.innerText =
       "Something went wrong";
 
+  } finally {
+
     fundBtn.disabled = false;
-    fundBtn.innerText = "Fund Wallet";
+    fundBtn.innerText = "Generate Account";
+
   }
 
 });

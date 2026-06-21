@@ -108,6 +108,10 @@ exports.securewaveWebhook = async (
   req,
   res
 ) => {
+  console.log("================================");
+  console.log("WEBHOOK HIT");
+  console.log(JSON.stringify(req.body, null, 2));
+  console.log("================================");
   try {
 
     const payload = req.body;

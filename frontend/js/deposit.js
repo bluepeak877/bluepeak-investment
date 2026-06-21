@@ -8,6 +8,9 @@ fundBtn.addEventListener("click", async () => {
 
   const message = document.getElementById("message");
 
+  const generatedAccount =
+    document.getElementById("generatedAccount");
+
   if (!amount || amount < 100) {
     message.innerText = "Minimum deposit is ₦100";
     return;
@@ -17,6 +20,9 @@ fundBtn.addEventListener("click", async () => {
 
     fundBtn.disabled = true;
     fundBtn.innerText = "Generating Account...";
+
+    message.innerText = "";
+    generatedAccount.innerHTML = "";
 
     const response = await fetch(
       "https://bluepeak-api-ooxc.onrender.com/api/payments/initialize",
@@ -34,12 +40,15 @@ fundBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    console.log("FULL RESPONSE:", data);
-    console.log("ERROR RESPONSE:", data);
+    console.log(
+      "FULL RESPONSE:",
+      JSON.stringify(data, null, 2)
+    );
 
-    if (response.ok && data.requestSuccessful) {
+    if (response.ok && data.success) {
 
-      const account = data.responseBody;
+      const account =
+        data.data?.data?.[0];
 
       if (!account) {
         message.innerText =
@@ -47,7 +56,7 @@ fundBtn.addEventListener("click", async () => {
         return;
       }
 
-      document.getElementById("generatedAccount").innerHTML = `
+      generatedAccount.innerHTML = `
         <div class="generated-account-card">
 
           <h3>Transfer Payment</h3>
@@ -72,6 +81,13 @@ fundBtn.addEventListener("click", async () => {
             ₦${Number(amount).toLocaleString()}
           </p>
 
+          <p>
+            <strong>Expires:</strong>
+            ${Math.floor(
+              account.expires / 3600
+            )} Hours
+          </p>
+
           <small>
             Transfer the exact amount above.
             Your wallet will be funded automatically
@@ -88,6 +104,7 @@ fundBtn.addEventListener("click", async () => {
 
       message.innerText =
         data.message ||
+        data.data?.message ||
         "Failed to generate account";
 
     }
@@ -102,7 +119,8 @@ fundBtn.addEventListener("click", async () => {
   } finally {
 
     fundBtn.disabled = false;
-    fundBtn.innerText = "Generate Account";
+    fundBtn.innerText =
+      "Generate Account";
 
   }
 

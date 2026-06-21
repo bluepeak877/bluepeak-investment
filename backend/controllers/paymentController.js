@@ -155,13 +155,14 @@ exports.securewaveWebhook = async (
           "Already processed",
       });
     }
-
+    console.log("WEBHOOK EMAIL:", email);
     const user =
       await User.findOne({
-        email,
+        email: email.tolowerCase(),
       });
-
+    console.log("USER FOUND:", user);
     if (!user) {
+      console.log("USER NOT FOUND");
       return res.status(404).json({
         message:
           "User not found",

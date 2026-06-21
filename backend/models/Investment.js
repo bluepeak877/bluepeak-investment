@@ -20,7 +20,7 @@ const investmentSchema = new mongoose.Schema(
 
     dailyROI: {
       type: Number,
-      default: 10,
+      default: 5,
     },
 
     durationDays: {

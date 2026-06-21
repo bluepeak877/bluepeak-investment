@@ -76,16 +76,22 @@ exports.buyPackage = async (req, res) => {
     }
 
     const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 90);
 
-    const totalReturn = selectedPackage.amount * 10;
+    const dailyROI = 5;
+    const durationDays = 90;
+
+    endDate.setDate(endDate.getDate() + durationDays);
+
+    const totalReturn =
+      ((selectedPackage.amount * dailyROI) / 100) *
+        durationDays;
 
     const investment = await Investment.create({
       user: user._id,
       packageName: selectedPackage.name,
       amount: selectedPackage.amount,
-      dailyROI: 10,
-      durationDays: 90,
+      dailyROI,
+      durationDays,
       totalReturn,
       endDate,
     });

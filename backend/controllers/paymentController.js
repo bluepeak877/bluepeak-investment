@@ -2,7 +2,9 @@ const axios = require("axios");
 const User = require("../models/user");
 const Transaction = require("../models/Transaction");
 
+// ===============================
 // Generate Dynamic Account
+// ===============================
 exports.initializePayment = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -34,7 +36,7 @@ exports.initializePayment = async (req, res) => {
         phone_number:
           user.phone || "08000000000",
 
-        bank_code: [3], // Safehaven
+        bank_code: [3],
 
         business_id:
           process.env.SECUREWAVE_BUSINESS_ID,
@@ -70,8 +72,7 @@ exports.initializePayment = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to generate account",
+      message: "Failed to generate account",
       error:
         error.response?.data ||
         error.message,
@@ -80,7 +81,9 @@ exports.initializePayment = async (req, res) => {
   }
 };
 
-// Temporary verification endpoint
+// ===============================
+// Verify Route
+// ===============================
 exports.verifyPayment = async (req, res) => {
   try {
 
@@ -96,31 +99,25 @@ exports.verifyPayment = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message:
-        "Verification failed",
+      message: "Verification failed",
     });
 
   }
 };
 
+// ===============================
 // SecureWave Webhook
-exports.securewaveWebhook = async (
-  req,
-  res
-) => {
+// ===============================
+exports.securewaveWebhook = async (req, res) => {
+
   console.log("================================");
   console.log("WEBHOOK HIT");
   console.log(JSON.stringify(req.body, null, 2));
   console.log("================================");
+
   try {
 
     const payload = req.body;
-
-    console.log(
-      "SECUREWAVE WEBHOOK:"
-    );
-
-    console.log(payload);
 
     if (
       payload.notification_status !==
@@ -129,8 +126,7 @@ exports.securewaveWebhook = async (
         "success"
     ) {
       return res.status(200).json({
-        message:
-          "Payment not successful",
+        message: "Payment not successful",
       });
     }
 
@@ -144,6 +140,12 @@ exports.securewaveWebhook = async (
     const email =
       payload.customer?.email;
 
+    console.log(
+      "WEBHOOK EMAIL:",
+      email
+    );
+
+    // Prevent duplicate credit
     const existingTransaction =
       await Transaction.findOne({
         description: reference,
@@ -151,24 +153,33 @@ exports.securewaveWebhook = async (
 
     if (existingTransaction) {
       return res.status(200).json({
-        message:
-          "Already processed",
-      });
-    }
-    console.log("WEBHOOK EMAIL:", email);
-    const user =
-      await User.findOne({
-        email: email.tolowerCase(),
-      });
-    console.log("USER FOUND:", user);
-    if (!user) {
-      console.log("USER NOT FOUND");
-      return res.status(404).json({
-        message:
-          "User not found",
+        message: "Already processed",
       });
     }
 
+    const user =
+      await User.findOne({
+        email: email,
+      });
+
+    console.log(
+      "USER FOUND:",
+      user
+    );
+
+    if (!user) {
+
+      console.log(
+        "USER NOT FOUND"
+      );
+
+      return res.status(404).json({
+        message: "User not found",
+      });
+
+    }
+
+    // Credit wallet
     user.depositWallet =
       Number(
         user.depositWallet || 0
@@ -201,6 +212,11 @@ exports.securewaveWebhook = async (
       status: "successful",
     });
 
+    console.log(
+      "WALLET CREDITED:",
+      amount
+    );
+
     return res.status(200).json({
       success: true,
       message:
@@ -222,4 +238,5 @@ exports.securewaveWebhook = async (
     });
 
   }
+
 };

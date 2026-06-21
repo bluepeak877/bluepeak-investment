@@ -34,7 +34,8 @@ fundBtn.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    console.log(data.responseBody);
+    console.log("FULL RESPONSE:", data);
+    console.log("ERROR RESPONSE:", data);
 
     if (response.ok && data.requestSuccessful) {
 

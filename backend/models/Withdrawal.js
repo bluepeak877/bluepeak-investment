@@ -29,10 +29,6 @@ const withdrawalSchema = new mongoose.Schema(
     },
 
     walletBreakdown: {
-      depositWallet: {
-        type: Number,
-        default: 0,
-      },
 
       referralWallet: {
         type: Number,
@@ -43,6 +39,22 @@ const withdrawalSchema = new mongoose.Schema(
         type: Number,
         default: 0,
       },
+    },
+    
+    withdrawalType: {
+      type: String,
+      enum: ["normal", "emergency"],
+      default: "normal",
+    },
+
+    charge: {
+      type: Number,
+      default: 0,
+    },
+
+    netAmount: {
+      type: Number,
+      default: 0,
     },
 
     status: {
@@ -55,6 +67,7 @@ const withdrawalSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    
   },
   { timestamps: true }
 );

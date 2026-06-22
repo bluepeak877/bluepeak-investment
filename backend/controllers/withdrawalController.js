@@ -244,3 +244,101 @@ exports.getLatestWithdrawalAnnouncement = async (req, res) => {
 
   }
 };
+
+exports.createEmergencyWithdrawal = async (req, res) => {
+  try {
+    const {amount} = req.body;
+
+    const withdrawalAmount = Number(amount);
+
+    if (
+      !withdrawalAmount ||
+      withdrawalAmount <= 0
+    ) {
+      return res.status(400).json({
+        message: "All fields are required",
+      });
+    }
+
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Check if admin enabled emergency withdrawals
+    if (!user.investmentWithdrawalEnabled) {
+      return res.status(400).json({
+        message:
+          "Emergency Investment Profit Withdrawal is currently unavailable.",
+      });
+    }
+
+    // Check for existing pending withdrawal
+    const pendingWithdrawal =
+      await Withdrawal.findOne({
+        user: user._id,
+        status: "pending",
+      });
+
+    if (pendingWithdrawal) {
+      return res.status(400).json({
+        message:
+          "You already have a pending withdrawal request.",
+      });
+    }
+
+    const lockedProfit =
+      Number(user.lockedProfit || 0);
+
+    if (withdrawalAmount > lockedProfit) {
+      return res.status(400).json({
+        message:
+          "Insufficient investment profit.",
+      });
+    }
+
+    const charge =
+      withdrawalAmount * 0.3;
+
+    const netAmount =
+      withdrawalAmount - charge;
+
+    const withdrawal =
+      await Withdrawal.create({
+        user: user._id,
+        amount: withdrawalAmount,
+        bankName: "Profit Conversion",
+        accountNumber: "N/A",
+        accountName:user.fullName,
+        withdrawalType: "emergency",
+        charge,
+        netAmount,
+      });
+
+    await Transaction.create({
+      user: user._id,
+      type: "withdrawal",
+      amount: withdrawalAmount,
+      description:
+        "Emergency Investment Profit Withdrawal",
+      status: "pending",
+    });
+
+    res.status(201).json({
+      message:
+        "Emergency withdrawal request submitted successfully.",
+      withdrawal,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+
+  }
+};

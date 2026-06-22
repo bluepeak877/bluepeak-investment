@@ -229,16 +229,37 @@ exports.updateWithdrawalStatus = async (req, res) => {
       await user.save();
     }
 
-    if (status === "approved") {
+   if (status === "approved") {
 
-      await WithdrawalAnnouncement.deleteMany({});
+      // Emergency withdrawal
+      if (withdrawal.withdrawalType === "emergency") {
 
-      await WithdrawalAnnouncement.create({
+        user.lockedProfit =
+          Math.max(
+          0,
+          Number(user.lockedProfit || 0) -
+          Number(withdrawal.amount || 0)
+        );
+
+      user.totalBalance =
+        calculateTotalBalance(user);
+
+    await user.save();
+    }
+
+    await WithdrawalAnnouncement.deleteMany({});
+
+    await WithdrawalAnnouncement.create({
       fullName: user.fullName,
-     amount: withdrawal.amount,
+      amount:
+        withdrawal.netAmount > 0
+          ? withdrawal.netAmount
+          : withdrawal.amount,
     });
 
-}
+    }
+
+
 
     await withdrawal.save();
 
@@ -257,5 +278,127 @@ exports.updateWithdrawalStatus = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+exports.enableInvestmentWithdrawal = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.investmentWithdrawalEnabled = true;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Investment withdrawal enabled",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+
+exports.disableInvestmentWithdrawal = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.investmentWithdrawalEnabled = false;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Investment withdrawal disabled",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+exports.enableInvestmentWithdrawal = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.investmentWithdrawalEnabled = true;
+
+    await user.save();
+
+    await Notification.create({
+      user: user._id,
+      title: "Investment Withdrawal Enabled",
+      message:
+        "Emergency Investment Profit Withdrawal has been enabled for your account.",
+    });
+
+    res.status(200).json({
+      message: "Investment withdrawal enabled successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+
+exports.disableInvestmentWithdrawal = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.investmentWithdrawalEnabled = false;
+
+    await user.save();
+
+    await Notification.create({
+      user: user._id,
+      title: "Investment Withdrawal Disabled",
+      message:
+        "Emergency Investment Profit Withdrawal has been disabled for your account.",
+    });
+
+    res.status(200).json({
+      message: "Investment withdrawal disabled successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
   }
 };

@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
   createWithdrawal,
+  createEmergencyWithdrawal,
   getMyWithdrawals,
   getLatestWithdrawalAnnouncement,
 } = require("../controllers/withdrawalController");
@@ -10,11 +11,19 @@ const {
 const { protect } = require("../middleware/authMiddleware");
 
 router.post("/", protect, createWithdrawal);
-router.get("/my-withdrawals", protect, getMyWithdrawals);
-router.get(
-  "/latest-announcement",
-  getLatestWithdrawalAnnouncement
+
+router.post(
+  "/emergency",
+  protect,
+  createEmergencyWithdrawal
 );
+
+router.get(
+  "/my-withdrawals",
+  protect,
+  getMyWithdrawals
+);
+
 router.get(
   "/latest-announcement",
   getLatestWithdrawalAnnouncement

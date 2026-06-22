@@ -331,6 +331,15 @@ function renderUsers() {
       const accountStatus = user.isSuspended ? "suspended" : "active";
       const nextSuspendedValue = user.isSuspended ? "false" : "true";
       const buttonLabel = user.isSuspended ? "Restore" : "Suspend";
+      const investmentStatus =
+        user.investmentWithdrawalEnabled
+          ? "Enabled"
+          : "Disabled";
+
+      const investmentAction =
+        user.investmentWithdrawalEnabled
+          ? "Disable Investment Withdrawal"
+          : "Enable Investment Withdrawal";
 
       return `
         <article class="admin-row">
@@ -340,10 +349,35 @@ function renderUsers() {
             <p>Balance: &#8358;${formatMoney(user.totalBalance)} - Referral: ${user.referralCode || "None"}</p>
           </div>
           <div class="admin-actions stacked">
-            <span class="status-pill ${statusClass(accountStatus)}">${accountStatus}</span>
-            <button class="${user.isSuspended ? "" : "danger-btn"}" onclick="toggleUserStatus('${user._id}', ${nextSuspendedValue})">
+
+            <span class="status-pill ${statusClass(accountStatus)}">
+              ${accountStatus}
+            </span>
+
+            <small>
+              Investment Withdrawal:
+              <strong>${investmentStatus}</strong>
+            </small>
+
+            <button
+            onclick="toggleInvestmentWithdrawal(
+              '${user._id}',
+              ${!user.investmentWithdrawalEnabled}
+            )"
+            >
+              ${investmentAction}
+            </button>
+
+            <button
+              class="${user.isSuspended ? "" : "danger-btn"}"
+              onclick="toggleUserStatus(
+              '${user._id}',
+              ${nextSuspendedValue}
+            )"
+            >
               ${buttonLabel}
             </button>
+
           </div>
         </article>
       `;
@@ -510,6 +544,30 @@ async function applyWalletAdjustment() {
   } finally {
     button.disabled = false;
     button.innerText = "Apply Wallet Adjustment";
+  }
+}
+
+async function toggleInvestmentWithdrawal(
+  userId,
+  enable
+) {
+
+  const endpoint = enable
+    ? `/admin/users/${userId}/enable-investment-withdrawal`
+    : `/admin/users/${userId}/disable-investment-withdrawal`;
+
+  const response = await adminFetch(endpoint, {
+    method: "PUT",
+  });
+
+  if (!response) return;
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  if (response.ok) {
+    loadAdminOverview();
   }
 }
 

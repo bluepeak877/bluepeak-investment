@@ -110,6 +110,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
+    investmentWithdrawalEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -45,6 +45,61 @@
     <p id="message" class="form-message"></p>
   </div>
 
+  <div class="withdrawal-rules">
+
+  <h3>Withdrawal Rules</h3>
+
+  <ul>
+
+    <li>
+      BluePeak supports Normal Withdrawal and
+      Investment Income Withdrawal.
+    </li>
+
+    <li>
+      Normal Withdrawal uses funds from your
+      Referral Wallet and Withdrawable Wallet.
+    </li>
+
+    <li>
+      Deposit Wallet funds cannot be withdrawn.
+    </li>
+
+    <li>
+      Investment capital remains locked until package maturity.
+    </li>
+
+    <li>
+      Users can withdraw a maximum of 30% of their
+      accumulated investment profit.
+    </li>
+
+    <li>
+      The remaining investment profit stays locked
+      until package maturity.
+    </li>
+
+    <li>
+      Minimum withdrawal amount is ₦1,000.
+    </li>
+
+    <li>
+      All withdrawals require admin approval.
+    </li>
+
+    <li>
+      Only one pending withdrawal request is allowed at a time.
+    </li>
+
+    <li>
+      Withdrawal requests are accepted every
+      <strong>Wednesday between 5:00 PM and 6:00 PM.</strong>
+    </li>
+
+  </ul>
+
+</div>
+
   <div class="history-card">
     <h3>Withdrawal History</h3>
     <div id="withdrawalHistory">
@@ -55,7 +110,7 @@
 </div>
 
 <script>
-const API_URL = "https://bluepeak-api-ooxc.onrender.com/api";
+const API_URL = "https://bluepeak.ng/api";
 const token = localStorage.getItem("token");
 
 if (!token) {

@@ -1,4 +1,4 @@
-const API_URL = "https://bluepeak-api-ooxc.onrender.com/api";
+const API_URL = "https://bluepeak.ng/api";
 const token = localStorage.getItem("token");
 
 function showToast(message, type = "success") {

@@ -25,7 +25,7 @@ fundBtn.addEventListener("click", async () => {
     generatedAccount.innerHTML = "";
 
     const response = await fetch(
-      "https://bluepeak-api-ooxc.onrender.com/api/payments/initialize",
+      "https://bluepeak.ng/api/payments/initialize",
       {
         method: "POST",
         headers: {

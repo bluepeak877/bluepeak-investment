@@ -128,7 +128,7 @@ exports.buyPackage = async (req, res) => {
       });
 
       if (referrer) {
-        const referralBonus = selectedPackage.amount * 0.3;
+        const referralBonus = selectedPackage.amount * 0.2;
 
         referrer.referralWallet =
           (referrer.referralWallet || 0) + referralBonus;

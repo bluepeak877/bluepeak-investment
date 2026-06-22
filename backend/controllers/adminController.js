@@ -176,26 +176,43 @@ exports.adjustUserWallet = async (req, res) => {
 
 exports.updateWithdrawalStatus = async (req, res) => {
   try {
+    console.log("ADMIN APPROVAL FUNCTION HIT");
     const { status, adminNote } = req.body;
 
     if (!["approved", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid withdrawal status" });
+      return res.status(400).json({
+        message: "Invalid withdrawal status",
+      });
     }
 
-    const withdrawal = await Withdrawal.findById(req.params.id);
+    const withdrawal = await Withdrawal.findById(
+      req.params.id
+    );
 
     if (!withdrawal) {
-      return res.status(404).json({ message: "Withdrawal not found" });
+      return res.status(404).json({
+        message: "Withdrawal not found",
+      });
     }
 
     if (withdrawal.status !== "pending") {
-      return res.status(400).json({ message: "Withdrawal has already been reviewed" });
+      return res.status(400).json({
+        message: "Withdrawal has already been reviewed",
+      });
     }
 
-    const user = await User.findById(withdrawal.user);
+    const user = await User.findById(
+      withdrawal.user
+    );
+    console.log("BEFORE");
+    console.log("withdrawableWallet:", user.withdrawableWallet);
+    console.log("convertedProfit:", user.convertedProfit);
+    console.log("lockedProfit:", user.lockedProfit);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({
+        message: "User not found",
+      });
     }
 
     withdrawal.status = status;
@@ -206,60 +223,87 @@ exports.updateWithdrawalStatus = async (req, res) => {
         user: user._id,
         type: "withdrawal",
         amount: withdrawal.amount,
-        description: "Withdrawal Request",
       },
       {
         status,
-     }
+      }
     );
 
+    // REJECTED
     if (status === "rejected") {
 
-      user.depositWallet +=
-      Number(withdrawal.walletBreakdown?.depositWallet || 0);
+      if (withdrawal.withdrawalType === "normal") {
 
-      user.referralWallet +=
-      Number(withdrawal.walletBreakdown?.referralWallet || 0);
+        user.depositWallet += Number(
+          withdrawal.walletBreakdown?.depositWallet || 0
+        );
 
-      user.withdrawableWallet +=
-      Number(withdrawal.walletBreakdown?.withdrawableWallet || 0);
+        user.referralWallet += Number(
+          withdrawal.walletBreakdown?.referralWallet || 0
+        );
 
-      user.totalBalance = calculateTotalBalance(user);
+        user.withdrawableWallet += Number(
+          withdrawal.walletBreakdown?.withdrawableWallet || 0
+        );
+
+      }
+
+      user.totalBalance =
+        calculateTotalBalance(user);
 
       await user.save();
-    }
+      const verifyUser = await User.findById(user._id);
 
-   if (status === "approved") {
+      console.log("AFTER SAVE");
+      console.log("withdrawableWallet:", verifyUser.withdrawableWallet);
+      console.log("convertedProfit:", verifyUser.convertedProfit);
+      console.log("lockedProfit:", verifyUser.lockedProfit);
+          }
 
-      // Emergency withdrawal
-      if (withdrawal.withdrawalType === "emergency") {
+    // APPROVED
+    if (status === "approved") {
+      console.log("APPROVED BLOCK HIT");
 
-        user.lockedProfit =
-          Math.max(
+      if (
+        true
+      ) {
+        console.log("EMERGENCY BLOCK HIT");
+
+        // Track converted profit permanently
+        user.convertedProfit =
+          Number(user.convertedProfit || 0) +
+          Number(withdrawal.amount || 0);
+
+        // Add net amount after charge
+        user.withdrawableWallet =
+          Number(user.withdrawableWallet || 0) +
+          Number(withdrawal.netAmount || 0);
+
+        // Update locked profit display immediately
+        user.lockedProfit = Math.max(
           0,
           Number(user.lockedProfit || 0) -
           Number(withdrawal.amount || 0)
         );
 
-      user.totalBalance =
-        calculateTotalBalance(user);
+        user.totalBalance =
+          calculateTotalBalance(user);
 
-    await user.save();
+        await user.save();
+      }
+
+      await WithdrawalAnnouncement.deleteMany(
+        {}
+      );
+
+      await WithdrawalAnnouncement.create({
+        fullName: user.fullName,
+        amount:
+          withdrawal.netAmount > 0
+            ? withdrawal.netAmount
+            : withdrawal.amount,
+      });
     }
-
-    await WithdrawalAnnouncement.deleteMany({});
-
-    await WithdrawalAnnouncement.create({
-      fullName: user.fullName,
-      amount:
-        withdrawal.netAmount > 0
-          ? withdrawal.netAmount
-          : withdrawal.amount,
-    });
-
-    }
-
-
 
     await withdrawal.save();
 
@@ -276,65 +320,17 @@ exports.updateWithdrawalStatus = async (req, res) => {
       message: `Withdrawal ${status}`,
       withdrawal,
     });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-
-exports.enableInvestmentWithdrawal = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    user.investmentWithdrawalEnabled = true;
-
-    await user.save();
-
-    res.status(200).json({
-      message: "Investment withdrawal enabled",
-    });
 
   } catch (error) {
 
     res.status(500).json({
-      message: error.message,
+      message: "Server error",
+      error: error.message,
     });
 
   }
 };
 
-exports.disableInvestmentWithdrawal = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    user.investmentWithdrawalEnabled = false;
-
-    await user.save();
-
-    res.status(200).json({
-      message: "Investment withdrawal disabled",
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message,
-    });
-
-  }
-};
 exports.enableInvestmentWithdrawal = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

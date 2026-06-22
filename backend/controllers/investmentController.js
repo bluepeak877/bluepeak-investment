@@ -266,7 +266,10 @@ exports.getMyInvestments = async (req, res) => {
       });
     }
 
-    user.lockedProfit = totalLockedProfit;
+    user.lockedProfit = Math.max(
+      0,
+      totalLockedProfit - Number(user.convertedProfit || 0)
+    );
 
     user.totalBalance =
       (user.depositWallet || 0) +

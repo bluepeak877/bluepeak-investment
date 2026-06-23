@@ -265,7 +265,7 @@ exports.updateWithdrawalStatus = async (req, res) => {
       console.log("APPROVED BLOCK HIT");
 
       if (
-        true
+        withdrawal.withdrawalType === "emergency"
       ) {
         console.log("EMERGENCY BLOCK HIT");
 
@@ -388,6 +388,56 @@ exports.disableInvestmentWithdrawal = async (req, res) => {
 
     res.status(200).json({
       message: "Investment withdrawal disabled successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+
+exports.enableInvestmentWithdrawalForAll =
+async (req, res) => {
+  try {
+
+    await User.updateMany(
+      {},
+      {
+        investmentWithdrawalEnabled: true,
+      }
+    );
+
+    res.status(200).json({
+      message:
+        "Investment withdrawal enabled for all users",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+
+exports.disableInvestmentWithdrawalForAll =
+async (req, res) => {
+  try {
+
+    await User.updateMany(
+      {},
+      {
+        investmentWithdrawalEnabled: false,
+      }
+    );
+
+    res.status(200).json({
+      message:
+        "Investment withdrawal disabled for all users",
     });
 
   } catch (error) {

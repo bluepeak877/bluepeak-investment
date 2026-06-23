@@ -11,6 +11,8 @@ const {
   adjustUserWallet,
   enableInvestmentWithdrawal,
   disableInvestmentWithdrawal,
+  enableInvestmentWithdrawalForAll,
+  disableInvestmentWithdrawalForAll,
 } = require("../controllers/adminController");
 
 router.get("/overview", protect, adminOnly, getOverview);
@@ -50,4 +52,17 @@ router.put(
   disableInvestmentWithdrawal
 );
 
+router.put(
+  "/users/enable-investment-withdrawal-all",
+  protect,
+  adminOnly,
+  enableInvestmentWithdrawalForAll
+);
+
+router.put(
+  "/users/disable-investment-withdrawal-all",
+  protect,
+  adminOnly,
+  disableInvestmentWithdrawalForAll
+);
 module.exports = router;

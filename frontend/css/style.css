@@ -2724,3 +2724,14 @@ body{
 .withdrawal-rules strong {
   color: #16a34a;
 }
+
+.admin-panel-head button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

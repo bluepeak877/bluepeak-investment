@@ -86,7 +86,24 @@
             <h2>User Management</h2>
             <p>Search users and suspend or restore access.</p>
           </div>
-          <input id="userSearch" class="admin-search" type="search" placeholder="Search name, email, phone">
+          <button
+            id="enableAllInvestmentBtn"
+            class="primary-btn"
+            style="margin-top:10px;"
+          >
+          Enable Investment Withdrawal For All Users
+          </button>
+
+          <button
+             id="disableAllInvestmentBtn"
+             class="danger-btn"
+            style="margin-top:10px;"
+          >
+            Disable Investment Withdrawal For All Users
+          </button>
+
+          
+        <input id="userSearch" class="admin-search" type="search" placeholder="Search name, email, phone">
         </div>
         <div id="usersList" class="admin-list">
           <p>Loading users...</p>
@@ -582,6 +599,64 @@ document.getElementById("withdrawalFilter").addEventListener("change", renderWit
 document.getElementById("userSearch").addEventListener("input", renderUsers);
 document.getElementById("transactionFilter").addEventListener("change", renderTransactions);
 document.getElementById("adjustWalletBtn").addEventListener("click", applyWalletAdjustment);
+
+document
+  .getElementById("enableAllInvestmentBtn")
+  .addEventListener("click", async () => {
+
+    alert("Enable All Clicked");
+
+    const confirmed = confirm(
+      "Enable investment withdrawal for ALL users?"
+    );
+
+    if (!confirmed) return;
+
+    const response = await adminFetch(
+      "/admin/users/enable-investment-withdrawal-all",
+      {
+        method: "PUT",
+      }
+    );
+
+    console.log(response);
+
+    if (!response) return;
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    loadAdminOverview();
+
+});
+
+document
+  .getElementById("disableAllInvestmentBtn")
+  .addEventListener("click", async () => {
+
+    const confirmed = confirm(
+      "Disable investment withdrawal for ALL users?"
+    );
+
+    if (!confirmed) return;
+
+    const response = await adminFetch(
+      "/admin/users/disable-investment-withdrawal-all",
+      {
+        method: "PUT",
+      }
+    );
+
+    if (!response) return;
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    loadAdminOverview();
+
+});
 
 loadAdminOverview();
 </script>

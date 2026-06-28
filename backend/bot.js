@@ -8,8 +8,25 @@ console.log("Token length:", token ? token.length : 0);
 console.log("======================");
 
 const bot = new TelegramBot(token, {
-  polling: true,
+  polling: {
+    autoStart: false,
+  },
 });
+
+bot.deleteWebhook()
+  .then(() => {
+    console.log("Webhook removed.");
+
+    return bot.startPolling({
+      restart: true,
+    });
+  })
+  .then(() => {
+    console.log("Telegram polling started.");
+  })
+  .catch((err) => {
+    console.error("Telegram polling error:", err.message);
+  });
 
 bot.onText(/\/start(?: (.+))?/, async (msg, match) => {
   try {

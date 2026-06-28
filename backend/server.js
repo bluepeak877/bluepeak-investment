@@ -4,6 +4,7 @@ const cors = require("cors");
 const dns = require("dns");
 const path = require("path");
 require("dotenv").config();
+require("./bot");
 
 const authRoutes = require("./routes/authRoutes");
 const investmentRoutes = require("./routes/investmentRoutes");
@@ -13,6 +14,7 @@ const referralRoutes = require("./routes/referralRoutes");
 const withdrawalRoutes = require("./routes/withdrawalRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const telegramRoutes = require("./routes/telegramRoutes");
 dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
@@ -29,6 +31,7 @@ app.use("/api/referrals", referralRoutes);
 app.use("/api/withdrawals", withdrawalRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/telegram", telegramRoutes);
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });

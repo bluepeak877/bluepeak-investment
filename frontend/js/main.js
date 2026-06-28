@@ -242,9 +242,56 @@ async function verifyPendingPayment() {
 
 async function claimDailyBonus() {
   try {
-    const response = await authorizedFetch("/auth/daily-bonus", {
-      method: "POST",
-    });
+
+    // Get latest user profile
+    const profileRes = await authorizedFetch("/auth/profile");
+
+    if (!profileRes) return;
+
+    const user = await profileRes.json();
+
+    // Telegram not connected
+    if (!user.telegramConnected) {
+
+      const connectRes = await authorizedFetch(
+        "/telegram/connect",
+        {
+          method: "POST",
+        }
+      );
+
+      if (!connectRes) return;
+
+      const connectData = await connectRes.json();
+
+      if (!connectRes.ok) {
+        showToast(
+          connectData.message || "Unable to connect Telegram",
+          "error"
+        );
+        return;
+      }
+
+      showToast(
+        "Opening Telegram...",
+        "success"
+      );
+
+      window.open(
+        connectData.botUrl,
+        "_blank"
+      );
+
+      return;
+    }
+
+    // Telegram already connected
+    const response = await authorizedFetch(
+      "/auth/daily-bonus",
+      {
+        method: "POST",
+      }
+    );
 
     if (!response) return;
 
@@ -260,12 +307,14 @@ async function claimDailyBonus() {
     }
 
   } catch (error) {
+
     console.log(error);
 
     showToast(
       "Failed to claim daily bonus",
       "error"
     );
+
   }
 }
 

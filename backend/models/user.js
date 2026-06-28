@@ -67,6 +67,11 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
 
+    telegramLinkToken: {
+      type: String,
+      default: "",
+    },
+
     // ROI / investment profit
     // Locked until package duration ends
     lockedProfit: {
@@ -91,6 +96,33 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+        // Telegram Integration
+    telegramConnected: {
+      type: Boolean,
+      default: false,
+    },
+
+    telegramId: {
+      type: String,
+      default: "",
+    },
+
+    telegramUsername: {
+      type: String,
+      default: "",
+    },
+
+    telegramFirstName: {
+      type: String,
+      default: "",
+    },
+
+    lastTelegramBonusClaim: {
+      type: Date,
+      default: null,
+    },
+
+    
     isAdmin: {
       type: Boolean,
       default: false,
@@ -122,5 +154,5 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-module.exports = mongoose.model("User", userSchema);
+module.exports =
+  mongoose.models.User || mongoose.model("User", userSchema);

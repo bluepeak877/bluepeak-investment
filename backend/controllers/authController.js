@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Transaction = require("../models/Transaction");
 const Notification = require("../models/Notification");
+const { checkChannelMembership } = require("../services/telegramService");
 
 function generateReferralCode(fullName) {
   const namePart = fullName.replace(/\s+/g, "").slice(0, 4).toUpperCase();
@@ -286,6 +287,24 @@ exports.claimDailyBonus = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         message: "User not found",
+      });
+    }
+
+    // Telegram must be connected
+    if (!user.telegramConnected) {
+      return res.status(400).json({
+        message: "Please connect your Telegram account first.",
+      });
+    }
+
+    // Verify Telegram channel membership
+    const isMember = await checkChannelMembership(user.telegramId);
+    console.log("Membership Check:", isMember);
+
+    if (!isMember) {
+      return res.status(400).json({
+        message:
+          "Please join our Telegram channel before claiming your daily bonus.",
       });
     }
 

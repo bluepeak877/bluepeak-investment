@@ -291,7 +291,7 @@ exports.claimDailyBonus = async (req, res) => {
     }
 
     // Telegram must be connected
-    if (!user.telegramConnected) {
+    if (!user.telegramConnected || !user.telegramId) {
       return res.status(400).json({
         message: "Please connect your Telegram account first.",
       });
@@ -309,14 +309,15 @@ exports.claimDailyBonus = async (req, res) => {
     }
 
     const now = new Date();
+    
 
-    if (user.dailyLoginClaimedAt) {
-      const lastClaim = new Date(user.dailyLoginClaimedAt);
+    if (user.lastTelegramBonusClaim) {
+      const lastClaim = new Date(user.lastTelegramBonusClaim);
       const diffHours = (now - lastClaim) / (1000 * 60 * 60);
 
       if (diffHours < 24) {
         return res.status(400).json({
-          message: "Daily bonus already claimed today",
+          message: "Telegram daily bonus already claimed today",
         });
       }
     }
@@ -330,6 +331,7 @@ exports.claimDailyBonus = async (req, res) => {
       (user.lockedDailyBonus || 0) +
       (user.lockedProfit || 0);
 
+    user.lastTelegramBonusClaim = now;
     user.dailyLoginClaimedAt = now;
 
     await user.save();

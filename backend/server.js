@@ -4,7 +4,8 @@ const cors = require("cors");
 const dns = require("dns");
 const path = require("path");
 require("dotenv").config();
-require("./bot");
+const bot = require("./bot");
+
 
 const authRoutes = require("./routes/authRoutes");
 const investmentRoutes = require("./routes/investmentRoutes");
@@ -21,6 +22,10 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.post("/telegram/webhook", (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 app.use("/api/auth", authRoutes);
@@ -45,11 +50,17 @@ mongoose
   .then(() => {
     console.log("MongoDB connected successfully");
 
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       console.log(`Server running on port ${PORT}`);
+
+      try {
+        await bot.setWebHook(
+          "https://bluepeak.ng/telegram/webhook"
+        );
+
+        console.log("Telegram webhook registered.");
+      } catch (err) {
+        console.error("Webhook registration failed:", err.message);
+      }
     });
   })
-  .catch((err) => {
-    console.log("MongoDB connection failed");
-    console.log(err.message);
-  });

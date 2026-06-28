@@ -1,32 +1,7 @@
 const TelegramBot = require("node-telegram-bot-api").default;
 const User = require("./models/user");
 
-const token = process.env.TELEGRAM_BOT_TOKEN;
-console.log("=== TELEGRAM DEBUG ===");
-console.log("Token exists:", !!token);
-console.log("Token length:", token ? token.length : 0);
-console.log("======================");
-
-const bot = new TelegramBot(token, {
-  polling: {
-    autoStart: false,
-  },
-});
-
-bot.deleteWebhook()
-  .then(() => {
-    console.log("Webhook removed.");
-
-    return bot.startPolling({
-      restart: true,
-    });
-  })
-  .then(() => {
-    console.log("Telegram polling started.");
-  })
-  .catch((err) => {
-    console.error("Telegram polling error:", err.message);
-  });
+const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
 
 bot.onText(/\/start(?: (.+))?/, async (msg, match) => {
   try {
@@ -58,7 +33,6 @@ The app will automatically generate a secure connection link for you.`
       );
     }
 
-    // Save Telegram details
     user.telegramConnected = true;
     user.telegramId = msg.from.id.toString();
     user.telegramUsername = msg.from.username || "";
@@ -77,7 +51,6 @@ We'll verify that you've joined our Telegram channel before awarding today's bon
     );
 
     console.log("Telegram Connected");
-
     console.log({
       user: user.email,
       telegramId: msg.from.id,
@@ -85,7 +58,6 @@ We'll verify that you've joined our Telegram channel before awarding today's bon
     });
 
   } catch (err) {
-
     console.error(err);
 
     try {
@@ -94,7 +66,6 @@ We'll verify that you've joined our Telegram channel before awarding today's bon
         "Something went wrong. Please try again."
       );
     } catch {}
-
   }
 });
 

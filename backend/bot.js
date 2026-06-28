@@ -2,6 +2,10 @@ const TelegramBot = require("node-telegram-bot-api").default;
 const User = require("./models/user");
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
+console.log("=== TELEGRAM DEBUG ===");
+console.log("Token exists:", !!token);
+console.log("Token length:", token ? token.length : 0);
+console.log("======================");
 
 const bot = new TelegramBot(token, {
   polling: true,

@@ -1,5 +1,5 @@
 const TelegramBot = require("node-telegram-bot-api").default;
-const User = require("./models/User");
+const User = require("./models/user");
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 

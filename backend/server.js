@@ -42,7 +42,10 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/telegram", telegramRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/onesignal", oneSignalRoutes);
-app.use("/api/test-notification",testNotificationRoutes);
+app.use(
+  "/api/test-notification",
+  testNotificationRoutes
+);
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });

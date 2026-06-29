@@ -1,5 +1,10 @@
 const axios = require("axios");
 
+console.log(
+  "REST KEY:",
+  process.env.ONESIGNAL_REST_API_KEY?.substring(0, 15)
+);
+
 module.exports = async function sendPushNotification(
   oneSignalId,
   title,

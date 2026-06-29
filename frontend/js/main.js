@@ -1,4 +1,5 @@
-const API_URL = "https://bluepeak.ng/api";
+const API_URL =
+  window.BLUEPEAK_CONFIG?.API_URL || "https://bluepeak.ng/api";
 const token = localStorage.getItem("token");
 
 function showToast(message, type = "success") {
@@ -30,6 +31,20 @@ function setText(id, value) {
 
 function formatMoney(amount) {
   return Number(amount || 0).toLocaleString();
+}
+
+function escapeHTML(value) {
+  return String(value || "").replace(/[&<>"']/g, (char) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+
+    return entities[char];
+  });
 }
 
 function setAvatar(fullName) {
@@ -340,8 +355,8 @@ async function loadNotifications() {
       .map(
         (n) => `
           <div class="notification-item">
-            <h5>${n.title}</h5>
-            <p>${n.message}</p>
+            <h5>${escapeHTML(n.title)}</h5>
+            <p>${escapeHTML(n.message)}</p>
           </div>
         `
       )
@@ -507,66 +522,106 @@ window.addEventListener("load", () => {
 // ===============================
 // Load Live Activities
 // ===============================
+function getActivityMeta(type) {
+  const activityTypes = {
+    deposit: { label: "Deposit", className: "activity-deposit" },
+    withdrawal: { label: "Withdrawal", className: "activity-withdrawal" },
+    investment: { label: "Investment", className: "activity-investment" },
+    bonus: { label: "Bonus", className: "activity-bonus" },
+    welcome_bonus: { label: "Welcome Bonus", className: "activity-bonus" },
+    daily_bonus: { label: "Daily Bonus", className: "activity-bonus" },
+    referral: { label: "Referral", className: "activity-referral" },
+    referral_bonus: {
+      label: "Referral Bonus",
+      className: "activity-referral",
+    },
+    profit: { label: "Profit", className: "activity-profit" },
+  };
+
+  return activityTypes[type] || {
+    label: "Update",
+    className: "activity-update",
+  };
+}
+
+function formatActivityTime(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "recently";
+  }
+
+  const diffSeconds = Math.max(0, Math.floor((Date.now() - date) / 1000));
+
+  if (diffSeconds < 60) return "just now";
+
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays}d ago`;
+}
+
 async function loadActivities() {
   try {
-   console.log("Loading activities...");
-
     const res = await fetch(`${API_URL}/activity`);
-    console.log("Status:", res.status);
+
+    if (!res.ok) {
+      throw new Error(`Activity request failed: ${res.status}`);
+    }
 
     const data = await res.json();
-    console.log("Activities:", data);
-
     const marquee = document.getElementById("activityMarquee");
 
-    if (!marquee) {
-      console.log("activityMarquee not found");
+    if (!marquee) return;
+
+    if (!Array.isArray(data) || data.length === 0) {
+      marquee.innerHTML = `
+        <span class="activity-item activity-update">
+          <span class="activity-badge">Update</span>
+          Welcome to BluePeak Investment
+        </span>
+      `;
       return;
     }
 
-    if (!data.length) {
-      marquee.innerHTML = "📢 Welcome to BluePeak Investment";
-      return;
-    }
-
-    // rest of your code
-
-    marquee.innerHTML = data
+    const items = data
       .map((activity) => {
-        let icon = "📢";
+        const meta = getActivityMeta(activity.type);
+        const amount = Number(activity.amount || 0);
+        const amountText =
+          amount > 0
+            ? `<strong>₦${formatMoney(amount)}</strong>`
+            : "";
+        const timeText = formatActivityTime(activity.createdAt);
 
-        switch (activity.type) {
-          case "deposit":
-            icon = "🟢";
-            break;
-
-          case "withdrawal":
-            icon = "💸";
-            break;
-
-          case "investment":
-            icon = "💰";
-            break;
-
-          case "bonus":
-            icon = "🎁";
-            break;
-
-          case "referral":
-            icon = "👥";
-            break;
-
-          case "profit":
-            icon = "📈";
-            break;
-        }
-
-        return `${icon} ${activity.message}`;
+        return `
+          <span class="activity-item ${meta.className}">
+            <span class="activity-badge">${meta.label}</span>
+            <span class="activity-message">${escapeHTML(activity.message)}</span>
+            ${amountText}
+            <small>${timeText}</small>
+          </span>
+        `;
       })
-      .join(" &nbsp;&nbsp; • &nbsp;&nbsp; ");
+      .join("");
 
+    marquee.innerHTML = items + items;
   } catch (err) {
-    console.log(err);
+    console.log("Live activity error:", err);
+
+    const marquee = document.getElementById("activityMarquee");
+    if (marquee) {
+      marquee.innerHTML = `
+        <span class="activity-item activity-update">
+          <span class="activity-badge">Update</span>
+          Live activity is loading
+        </span>
+      `;
+    }
   }
 }
 // ===============================

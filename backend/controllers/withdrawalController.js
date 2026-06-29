@@ -118,16 +118,10 @@ exports.createWithdrawal = async (req, res) => {
 
     await sendPushNotification(
       user.oneSignalId,
-      "💸 Withdrawal Submitted",
+      "Withdrawal Submitted",
       `Your withdrawal request of ₦${withdrawalAmount.toLocaleString()} has been submitted successfully and is awaiting approval.`
     );
 
-    await createActivity(
-      user,
-      "withdrawal",
-      `${user.fullName} requested a withdrawal of ₦${withdrawalAmount.toLocaleString()}`,
-      withdrawalAmount
-    );
 
     res.status(201).json({
       message: "Withdrawal request submitted",
@@ -213,7 +207,7 @@ exports.approveWithdrawal = async (req, res) => {
 
   await sendPushNotification(
     withdrawal.user.oneSignalId,
-    "✅ Withdrawal Approved",
+    "Withdrawal Approved",
     `Your withdrawal of ₦${approvedAmount.toLocaleString()} has been approved and will be credited to your bank account shortly.`
   );
 
@@ -343,7 +337,7 @@ exports.createEmergencyWithdrawal = async (req, res) => {
 
     await sendPushNotification(
       user.oneSignalId,
-      "⚡ Emergency Withdrawal Submitted",
+      "Withdrawal Submitted",
       `Your emergency investment withdrawal request of ₦${withdrawalAmount.toLocaleString()} has been submitted for review.`
     );
 

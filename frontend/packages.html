@@ -191,9 +191,12 @@
   </div>
 </div>
 
+<script src="./js/config.js"></script>
 <script>
 
 let selectedPackage = null;
+const API_URL =
+  window.BLUEPEAK_CONFIG?.API_URL || "https://bluepeak.ng/api";
 
 function showToast(message, type = "success") {
 
@@ -263,7 +266,7 @@ async function buyPackage(packageKey) {
   try {
 
     const response = await fetch(
-      "https://bluepeak-api-ooxc.onrender.com/api/investments/buy",
+      `${API_URL}/investments/buy`,
       {
         method: "POST",
         headers: {

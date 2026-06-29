@@ -6,6 +6,7 @@ const Transaction = require("../models/Transaction");
 const Notification = require("../models/Notification");
 const { checkChannelMembership } = require("../services/telegramService");
 const sendPushNotification = require("../utils/sendPushNotification");
+const createActivity = require("../utils/createActivity");
 
 function generateReferralCode(fullName) {
   const namePart = fullName.replace(/\s+/g, "").slice(0, 4).toUpperCase();
@@ -51,9 +52,10 @@ exports.register = async (req, res) => {
     }
 
     let referredBy = null;
+    let referrer = null;
 
     if (referralCode) {
-      const referrer = await User.findOne({ referralCode });
+      referrer = await User.findOne({ referralCode });
 
       if (!referrer) {
         return res.status(400).json({
@@ -84,6 +86,22 @@ exports.register = async (req, res) => {
       description: "Welcome bonus locked",
       status: "successful",
     });
+
+    await createActivity(
+      newUser,
+      "welcome_bonus",
+      `${newUser.fullName} received a ₦1,500 welcome bonus`,
+      1500
+    );
+
+    if (referrer) {
+      await createActivity(
+        referrer,
+        "referral",
+        `${referrer.fullName} referred a new member to BluePeak`,
+        0
+      );
+    }
 
     res.status(201).json({
       message: "Registration successful",
@@ -339,8 +357,8 @@ exports.claimDailyBonus = async (req, res) => {
 
     await createActivity(
       user,
-      "bonus",
-      `${user.fullName} claimed today's daily bonus`,
+      "daily_bonus",
+      `${user.fullName} claimed a ₦100 daily bonus`,
       100
     );
 
@@ -360,7 +378,7 @@ exports.claimDailyBonus = async (req, res) => {
 
     await sendPushNotification(
       user.oneSignalId,
-      "🎁 Daily Bonus Claimed",
+      "Daily Bonus Claimed",
       "₦100 has been added to your locked daily bonus wallet."
     );
 

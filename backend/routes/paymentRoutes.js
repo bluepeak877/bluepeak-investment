@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const createRateLimiter = require("../middleware/rateLimiter");
 
 const {
   initializePayment,
@@ -11,9 +12,16 @@ const {
   protect,
 } = require("../middleware/authMiddleware");
 
+const paymentLimiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  message: "Too many payment requests. Please try again later.",
+});
+
 // Generate Dynamic Account
 router.post(
   "/initialize",
+  paymentLimiter,
   protect,
   initializePayment
 );

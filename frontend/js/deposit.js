@@ -1,4 +1,6 @@
 const fundBtn = document.getElementById("fundBtn");
+const API_URL =
+  window.BLUEPEAK_CONFIG?.API_URL || "https://bluepeak.ng/api";
 
 fundBtn.addEventListener("click", async () => {
 
@@ -25,7 +27,7 @@ fundBtn.addEventListener("click", async () => {
     generatedAccount.innerHTML = "";
 
     const response = await fetch(
-      "https://bluepeak.ng/api/payments/initialize",
+      `${API_URL}/payments/initialize`,
       {
         method: "POST",
         headers: {

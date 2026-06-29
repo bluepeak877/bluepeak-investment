@@ -216,7 +216,7 @@ exports.securewaveWebhook = async (req, res) => {
 
     await sendPushNotification(
       user.oneSignalId,
-      "💰 Deposit Successful",
+      "Deposit Successful",
       `₦${amount.toLocaleString()} has been credited to your BluePeak wallet.`
     );
 

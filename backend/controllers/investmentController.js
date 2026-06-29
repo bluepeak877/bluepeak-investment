@@ -126,7 +126,7 @@ exports.buyPackage = async (req, res) => {
 
     await sendPushNotification(
       user.oneSignalId,
-      "📦 Investment Purchased",
+      "Investment Purchased",
       `${selectedPackage.name} has been activated successfully.`
     );
 
@@ -173,13 +173,13 @@ exports.buyPackage = async (req, res) => {
 
         await sendPushNotification(
           referrer.oneSignalId,
-          "👥 Referral Bonus",
+          "Referral Bonus",
           `You earned ₦${referralBonus.toLocaleString()} referral bonus from a package purchase.`
         );
 
         await createActivity(
           referrer,
-          "referral",
+          "referral_bonus",
           `${referrer.fullName} earned ₦${referralBonus.toLocaleString()} referral bonus`,
           referralBonus
         );
@@ -285,7 +285,7 @@ exports.getMyInvestments = async (req, res) => {
 
         await sendPushNotification(
           user.oneSignalId,
-          "📈 Investment Completed",
+          "Investment Completed",
           `${investment.packageName} has matured. ₦${investment.totalReturn.toLocaleString()} is now available in your withdrawable wallet.`
         );
 

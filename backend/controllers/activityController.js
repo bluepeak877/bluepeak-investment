@@ -5,8 +5,10 @@ exports.getActivities = async (req, res) => {
 
     const activities = await Activity
       .find()
+      .select("name type message amount createdAt")
       .sort({ createdAt: -1 })
-      .limit(30);
+      .limit(20)
+      .lean();
 
     res.json(activities);
 

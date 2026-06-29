@@ -1,11 +1,18 @@
 const express = require("express");
 const router = express.Router();
+const createRateLimiter = require("../middleware/rateLimiter");
 
 const { protect } = require("../middleware/authMiddleware");
 const User = require("../models/user");
 const sendPushNotification = require("../utils/sendPushNotification");
 
-router.get("/send", protect, async (req, res) => {
+const testNotificationLimiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 3,
+  message: "Too many test notifications. Please try again later.",
+});
+
+router.get("/send", testNotificationLimiter, protect, async (req, res) => {
   try {
 
     const user = await User.findById(req.user.userId);
@@ -18,7 +25,7 @@ router.get("/send", protect, async (req, res) => {
 
     await sendPushNotification(
       user.oneSignalId,
-      "🎉 BluePeak Test",
+      "BluePeak Test",
       "Congratulations! Your first push notification is working."
     );
 

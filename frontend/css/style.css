@@ -2740,9 +2740,10 @@ body{
    Live Activity Card
 =============================== */
 .live-activity-card{
-    background:#fff;
-    border-radius:15px;
-    padding:15px;
+    background:linear-gradient(135deg,#ffffff,#f7fbff);
+    border:1px solid #e5eefb;
+    border-radius:12px;
+    padding:14px 15px;
     margin-bottom:20px;
     box-shadow:0 8px 20px rgba(0,0,0,.08);
     overflow:hidden;
@@ -2753,7 +2754,18 @@ body{
     font-size:18px;
     font-weight:700;
     color:#1565c0;
-    margin-bottom:10px;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.live-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#16a34a;
+    box-shadow:0 0 0 6px rgba(22,163,74,.12);
 }
 
 /* Activity Scrolling Container */
@@ -2761,25 +2773,91 @@ body{
     overflow:hidden;
     white-space:nowrap;
     position:relative;
+    min-height:42px;
+}
+
+.activity-wrapper::before,
+.activity-wrapper::after{
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:34px;
+    z-index:2;
+    pointer-events:none;
+}
+
+.activity-wrapper::before{
+    left:0;
+    background:linear-gradient(90deg,#fff,rgba(255,255,255,0));
+}
+
+.activity-wrapper::after{
+    right:0;
+    background:linear-gradient(270deg,#f7fbff,rgba(247,251,255,0));
 }
 
 /* Moving Activity Text */
 .activity-marquee{
-
-    display:inline-block;
-
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
     white-space:nowrap;
-
-    /* Start animation outside the right side */
-    padding-left:100%;
-
-    /* Infinite scrolling animation */
-    animation:scrollActivity 35s linear infinite;
-
-    font-size:15px;
-
+    min-width:max-content;
+    animation:scrollActivity 42s linear infinite;
+    font-size:14px;
     font-weight:500;
+    will-change:transform;
+}
 
+.activity-item{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 10px;
+    border-radius:999px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    color:#1f2937;
+    box-shadow:0 4px 12px rgba(15,23,42,.06);
+}
+
+.activity-badge{
+    border-radius:999px;
+    padding:3px 8px;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:#fff;
+    background:#2563eb;
+}
+
+.activity-message{
+    max-width:360px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.activity-item strong{
+    color:#0f766e;
+}
+
+.activity-item small{
+    color:#6b7280;
+}
+
+.activity-deposit .activity-badge{background:#16a34a;}
+.activity-withdrawal .activity-badge{background:#dc2626;}
+.activity-investment .activity-badge{background:#2563eb;}
+.activity-bonus .activity-badge{background:#7c3aed;}
+.activity-referral .activity-badge{background:#0891b2;}
+.activity-profit .activity-badge{background:#f59e0b;}
+.activity-update .activity-badge{background:#64748b;}
+
+.activity-update{
+    min-width:260px;
+    justify-content:center;
 }
 
 /* Pause scrolling when mouse hovers */
@@ -2792,14 +2870,12 @@ body{
 =============================== */
 @keyframes scrollActivity{
 
-    /* Start from the right */
     from{
         transform:translateX(0);
     }
 
-    /* Move completely to the left */
     to{
-        transform:translateX(-100%);
+        transform:translateX(-50%);
     }
 
 }

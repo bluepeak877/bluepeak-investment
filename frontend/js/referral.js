@@ -1,4 +1,5 @@
-const API_URL = "https://bluepeak.ng/api";
+const API_URL =
+  window.BLUEPEAK_CONFIG?.API_URL || "https://bluepeak.ng/api";
 const token = localStorage.getItem("token");
 
 if (!token) {

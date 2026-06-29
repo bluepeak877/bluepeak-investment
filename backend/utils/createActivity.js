@@ -1,7 +1,8 @@
 const Activity = require("../models/Activity");
 
 function shortName(fullName) {
-  const firstName = fullName.trim().split(" ")[0];
+  const trimmedName = String(fullName || "").trim();
+  const firstName = trimmedName ? trimmedName.split(" ")[0] : "User";
 
   if (firstName.length <= 6) {
     return firstName;
@@ -20,13 +21,21 @@ module.exports = async (
   amount = 0
 ) => {
   try {
+    if (!user || !user._id) {
+      return;
+    }
+
     const displayName = shortName(user.fullName);
+    const messageText = String(message || "");
+    const activityMessage = user.fullName
+      ? messageText.replace(user.fullName, displayName)
+      : messageText;
 
     await Activity.create({
       user: user._id,
       name: displayName,
       type,
-      message: message.replace(user.fullName, displayName),
+      message: activityMessage,
       amount,
     });
 

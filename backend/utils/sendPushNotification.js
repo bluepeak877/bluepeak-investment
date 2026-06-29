@@ -21,7 +21,7 @@ module.exports = async function sendPushNotification(
     }
 
     const response = await axios.post(
-      "https://api.onesignal.com/notifications?c=push",
+      "https://api.onesignal.com/notifications",
       {
         app_id: process.env.ONESIGNAL_APP_ID,
 
@@ -37,7 +37,7 @@ module.exports = async function sendPushNotification(
       },
       {
         headers: {
-          Authorization: `Key ${process.env.ONESIGNAL_REST_API_KEY}`,
+          Authorization: `Bearer ${process.env.ONESIGNAL_REST_API_KEY}`,
           "Content-Type": "application/json",
         },
       }
@@ -49,11 +49,17 @@ module.exports = async function sendPushNotification(
     return response.data;
 
   } catch (err) {
-
     console.log("❌ Push Notification Error:");
 
-    console.log(
-      err.response?.data || err.message
-    );
+    if (err.response) {
+      console.log("Status:", err.response.status);
+      console.log("Headers:", err.response.headers);
+      console.log(
+        "Body:",
+        JSON.stringify(err.response.data, null, 2)
+      );
+    } else {
+      console.log(err.message);
+    }
   }
 };

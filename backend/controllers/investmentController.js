@@ -3,6 +3,7 @@ const Investment = require("../models/Investment");
 const Transaction = require("../models/Transaction");
 const Notification = require("../models/Notification");
 const calculateLevel = require("../utils/levelCalculator");
+const createActivity = require("../utils/createActivity");
 
 const packages = {
   breeze: { name: "BluePeak Breeze", amount: 3000 },
@@ -122,6 +123,13 @@ exports.buyPackage = async (req, res) => {
       message: `You successfully purchased ${selectedPackage.name} for ₦${selectedPackage.amount.toLocaleString()}.`,
     });
 
+    await createActivity(
+      user,
+      "investment",
+      `${user.fullName} purchased ${selectedPackage.name}`,
+      selectedPackage.amount
+    );
+
     if (user.referredBy) {
       const referrer = await User.findOne({
         referralCode: user.referredBy,
@@ -155,6 +163,13 @@ exports.buyPackage = async (req, res) => {
           title: "Referral Bonus Received",
           message: `You received ₦${referralBonus.toLocaleString()} referral bonus from a package purchase.`,
         });
+
+        await createActivity(
+          referrer,
+          "referral",
+          `${referrer.fullName} earned ₦${referralBonus.toLocaleString()} referral bonus`,
+          referralBonus
+        );
       }
     }
 
@@ -254,6 +269,15 @@ exports.getMyInvestments = async (req, res) => {
           title: "Investment Completed",
           message: `${investment.packageName} has matured. ₦${investment.totalReturn.toLocaleString()} is now withdrawable.`,
         });
+
+        await createActivity(
+          user,
+          "profit",
+          `${user.fullName} received ₦${investment.totalReturn.toLocaleString()} investment profit`,
+          investment.totalReturn
+        );
+
+        
       }
 
       if (investment.status === "active") {

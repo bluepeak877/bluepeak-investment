@@ -1,6 +1,7 @@
 const axios = require("axios");
 const User = require("../models/user");
 const Transaction = require("../models/Transaction");
+const createActivity = require("../utils/createActivity");
 
 // ===============================
 // Generate Dynamic Account
@@ -211,6 +212,13 @@ exports.securewaveWebhook = async (req, res) => {
       description: reference,
       status: "successful",
     });
+
+    await createActivity(
+      user,
+      "deposit",
+      `${user.fullName} deposited ₦${amount.toLocaleString()}`,
+      amount
+    );
 
     console.log(
       "WALLET CREDITED:",

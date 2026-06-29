@@ -336,6 +336,13 @@ exports.claimDailyBonus = async (req, res) => {
 
     await user.save();
 
+    await createActivity(
+      user,
+      "bonus",
+      `${user.fullName} claimed today's daily bonus`,
+      100
+    );
+
     await Transaction.create({
       user: user._id,
       type: "bonus",

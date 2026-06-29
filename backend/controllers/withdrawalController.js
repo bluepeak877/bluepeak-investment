@@ -2,6 +2,7 @@ const Withdrawal = require("../models/Withdrawal");
 const User = require("../models/user");
 const Transaction = require("../models/Transaction");
 const WithdrawalAnnouncement = require("../models/WithdrawalAnnouncement");
+const createActivity = require("../utils/createActivity");
 
 exports.createWithdrawal = async (req, res) => {
   try {
@@ -114,6 +115,13 @@ exports.createWithdrawal = async (req, res) => {
 
     await user.save();
 
+    await createActivity(
+      user,
+      "withdrawal",
+      `${user.fullName} requested a withdrawal of ₦${withdrawalAmount.toLocaleString()}`,
+      withdrawalAmount
+    );
+
     res.status(201).json({
       message: "Withdrawal request submitted",
       withdrawal,
@@ -191,6 +199,13 @@ exports.approveWithdrawal = async (req, res) => {
       }
     );
 
+    await createActivity(
+      withdrawal.user,
+      "withdrawal",
+      `${withdrawal.user.fullName} successfully withdrew ₦${withdrawal.amount.toLocaleString()}`,
+      withdrawal.amount
+    );
+    
     res.status(200).json({
       message: "Withdrawal approved successfully",
     });
@@ -225,25 +240,6 @@ exports.getLatestWithdrawalAnnouncement =
     }
 };
 
-exports.getLatestWithdrawalAnnouncement = async (req, res) => {
-  try {
-
-    const announcement =
-      await WithdrawalAnnouncement.findOne()
-      .sort({ createdAt: -1 });
-
-    res.status(200).json({
-      announcement,
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message,
-    });
-
-  }
-};
 
 exports.createEmergencyWithdrawal = async (req, res) => {
   try {

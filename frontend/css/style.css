@@ -2735,3 +2735,71 @@ body{
   gap: 10px;
   flex-wrap: wrap;
 }
+
+/* ===============================
+   Live Activity Card
+=============================== */
+.live-activity-card{
+    background:#fff;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    overflow:hidden;
+}
+
+/* Live Activity Title */
+.live-title{
+    font-size:18px;
+    font-weight:700;
+    color:#1565c0;
+    margin-bottom:10px;
+}
+
+/* Activity Scrolling Container */
+.activity-wrapper{
+    overflow:hidden;
+    white-space:nowrap;
+    position:relative;
+}
+
+/* Moving Activity Text */
+.activity-marquee{
+
+    display:inline-block;
+
+    white-space:nowrap;
+
+    /* Start animation outside the right side */
+    padding-left:100%;
+
+    /* Infinite scrolling animation */
+    animation:scrollActivity 35s linear infinite;
+
+    font-size:15px;
+
+    font-weight:500;
+
+}
+
+/* Pause scrolling when mouse hovers */
+.activity-marquee:hover{
+    animation-play-state:paused;
+}
+
+/* ===============================
+   Live Activity Animation
+=============================== */
+@keyframes scrollActivity{
+
+    /* Start from the right */
+    from{
+        transform:translateX(0);
+    }
+
+    /* Move completely to the left */
+    to{
+        transform:translateX(-100%);
+    }
+
+}

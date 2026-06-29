@@ -102,10 +102,68 @@ function copyLink() {
   showToast("Referral link copied", "success");
 }
 
-function copyLink() {
-  const link = document.getElementById("referralLink").innerText;
-  navigator.clipboard.writeText(link);
-  alert("Referral link copied");
+loadReferralData();
+
+// ===============================
+// Load Live Activities
+// ===============================
+async function loadActivities() {
+  try {
+    const res = await fetch(`${API_URL}/activity`);
+    const data = await res.json();
+
+    const marquee = document.getElementById("activityMarquee");
+
+    if (!marquee) return;
+
+    if (!data.length) {
+      marquee.innerHTML = "📢 Welcome to BluePeak Investment";
+      return;
+    }
+
+    marquee.innerHTML = data
+      .map((activity) => {
+        let icon = "📢";
+
+        switch (activity.type) {
+          case "deposit":
+            icon = "🟢";
+            break;
+
+          case "withdrawal":
+            icon = "💸";
+            break;
+
+          case "investment":
+            icon = "💰";
+            break;
+
+          case "bonus":
+            icon = "🎁";
+            break;
+
+          case "referral":
+            icon = "👥";
+            break;
+
+          case "profit":
+            icon = "📈";
+            break;
+        }
+
+        return `${icon} ${activity.message}`;
+      })
+      .join(" &nbsp;&nbsp; • &nbsp;&nbsp; ");
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+// ===============================
+// Live Activity
+// ===============================
+if (document.getElementById("activityMarquee")) {
+  loadActivities();
+  setInterval(loadActivities, 30000);
 }
 
-loadReferralData();

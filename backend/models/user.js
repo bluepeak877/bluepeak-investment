@@ -150,7 +150,21 @@ const userSchema = new mongoose.Schema(
     convertedProfit: {
       type: Number,
       default: 0,
-}
+    },
+    // ===============================
+    // OneSignal
+    // ===============================
+    oneSignalId: {
+      type: String,
+      default: "",
+    },
+
+    pushEnabled: {
+      type: Boolean,
+      default: false,
+    },
+
+
   },
   { timestamps: true }
 );

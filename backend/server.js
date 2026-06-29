@@ -17,6 +17,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const telegramRoutes = require("./routes/telegramRoutes");
 const activityRoutes = require("./routes/activityRoutes");
+const oneSignalRoutes = require("./routes/oneSignalRoutes");
 dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
@@ -39,6 +40,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/telegram", telegramRoutes);
 app.use("/api/activity", activityRoutes);
+app.use("/api/onesignal", oneSignalRoutes);
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });

@@ -5,6 +5,7 @@ const User = require("../models/user");
 const Transaction = require("../models/Transaction");
 const Notification = require("../models/Notification");
 const { checkChannelMembership } = require("../services/telegramService");
+const sendPushNotification = require("../utils/sendPushNotification");
 
 function generateReferralCode(fullName) {
   const namePart = fullName.replace(/\s+/g, "").slice(0, 4).toUpperCase();
@@ -356,6 +357,12 @@ exports.claimDailyBonus = async (req, res) => {
       title: "Daily Bonus Claimed",
       message: "₦100 daily login bonus has been added to your locked bonus wallet.",
     });
+
+    await sendPushNotification(
+      user.oneSignalId,
+      "🎁 Daily Bonus Claimed",
+      "₦100 has been added to your locked daily bonus wallet."
+    );
 
     res.status(200).json({
       message: "Daily bonus claimed successfully",

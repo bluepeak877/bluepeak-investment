@@ -4,6 +4,7 @@ const Transaction = require("../models/Transaction");
 const Notification = require("../models/Notification");
 const calculateLevel = require("../utils/levelCalculator");
 const createActivity = require("../utils/createActivity");
+const sendPushNotification = require("../utils/sendPushNotification");
 
 const packages = {
   breeze: { name: "BluePeak Breeze", amount: 3000 },
@@ -123,6 +124,12 @@ exports.buyPackage = async (req, res) => {
       message: `You successfully purchased ${selectedPackage.name} for ₦${selectedPackage.amount.toLocaleString()}.`,
     });
 
+    await sendPushNotification(
+      user.oneSignalId,
+      "📦 Investment Purchased",
+      `${selectedPackage.name} has been activated successfully.`
+    );
+
     await createActivity(
       user,
       "investment",
@@ -163,6 +170,12 @@ exports.buyPackage = async (req, res) => {
           title: "Referral Bonus Received",
           message: `You received ₦${referralBonus.toLocaleString()} referral bonus from a package purchase.`,
         });
+
+        await sendPushNotification(
+          referrer.oneSignalId,
+          "👥 Referral Bonus",
+          `You earned ₦${referralBonus.toLocaleString()} referral bonus from a package purchase.`
+        );
 
         await createActivity(
           referrer,
@@ -269,6 +282,12 @@ exports.getMyInvestments = async (req, res) => {
           title: "Investment Completed",
           message: `${investment.packageName} has matured. ₦${investment.totalReturn.toLocaleString()} is now withdrawable.`,
         });
+
+        await sendPushNotification(
+          user.oneSignalId,
+          "📈 Investment Completed",
+          `${investment.packageName} has matured. ₦${investment.totalReturn.toLocaleString()} is now available in your withdrawable wallet.`
+        );
 
         await createActivity(
           user,

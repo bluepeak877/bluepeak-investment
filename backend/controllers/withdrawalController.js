@@ -3,6 +3,7 @@ const User = require("../models/user");
 const Transaction = require("../models/Transaction");
 const WithdrawalAnnouncement = require("../models/WithdrawalAnnouncement");
 const createActivity = require("../utils/createActivity");
+const sendPushNotification = require("../utils/sendPushNotification");
 
 exports.createWithdrawal = async (req, res) => {
   try {
@@ -115,6 +116,12 @@ exports.createWithdrawal = async (req, res) => {
 
     await user.save();
 
+    await sendPushNotification(
+      user.oneSignalId,
+      "💸 Withdrawal Submitted",
+      `Your withdrawal request of ₦${withdrawalAmount.toLocaleString()} has been submitted successfully and is awaiting approval.`
+    );
+
     await createActivity(
       user,
       "withdrawal",
@@ -199,12 +206,23 @@ exports.approveWithdrawal = async (req, res) => {
       }
     );
 
-    await createActivity(
-      withdrawal.user,
-      "withdrawal",
-      `${withdrawal.user.fullName} successfully withdrew ₦${withdrawal.amount.toLocaleString()}`,
-      withdrawal.amount
-    );
+   const approvedAmount =
+    withdrawal.withdrawalType === "emergency"
+      ? withdrawal.netAmount
+      : withdrawal.amount;
+
+  await sendPushNotification(
+    withdrawal.user.oneSignalId,
+    "✅ Withdrawal Approved",
+    `Your withdrawal of ₦${approvedAmount.toLocaleString()} has been approved and will be credited to your bank account shortly.`
+  );
+
+  await createActivity(
+    withdrawal.user,
+    "withdrawal",
+    `${withdrawal.user.fullName} successfully withdrew ₦${approvedAmount.toLocaleString()}`,
+    approvedAmount
+  );
     
     res.status(200).json({
       message: "Withdrawal approved successfully",
@@ -322,6 +340,12 @@ exports.createEmergencyWithdrawal = async (req, res) => {
         "Emergency Investment Profit Withdrawal",
       status: "pending",
     });
+
+    await sendPushNotification(
+      user.oneSignalId,
+      "⚡ Emergency Withdrawal Submitted",
+      `Your emergency investment withdrawal request of ₦${withdrawalAmount.toLocaleString()} has been submitted for review.`
+    );
 
     res.status(201).json({
       message:

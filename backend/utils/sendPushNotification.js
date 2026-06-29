@@ -6,16 +6,21 @@ module.exports = async function sendPushNotification(
   message
 ) {
   try {
-    if (!oneSignalId) return;
+    if (
+      !oneSignalId ||
+      typeof oneSignalId !== "string" ||
+      oneSignalId.trim() === ""
+    ) {
+      console.log("No valid OneSignal ID found.");
+      return;
+    }
 
-    await axios.post(
+    const response = await axios.post(
       "https://api.onesignal.com/notifications?c=push",
       {
         app_id: process.env.ONESIGNAL_APP_ID,
 
-        include_subscription_ids: [
-          oneSignalId,
-        ],
+        include_subscription_ids: [oneSignalId],
 
         headings: {
           en: title,
@@ -33,19 +38,17 @@ module.exports = async function sendPushNotification(
       }
     );
 
-    console.log(
-      "Push notification sent."
-    );
+    console.log("✅ Push notification sent.");
+    console.log(response.data);
+
+    return response.data;
 
   } catch (err) {
 
-    console.log(
-      "Push Notification Error:"
-    );
+    console.log("❌ Push Notification Error:");
 
     console.log(
       err.response?.data || err.message
     );
-
   }
 };

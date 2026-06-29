@@ -2,6 +2,7 @@ const axios = require("axios");
 const User = require("../models/user");
 const Transaction = require("../models/Transaction");
 const createActivity = require("../utils/createActivity");
+const sendPushNotification = require("../utils/sendPushNotification");
 
 // ===============================
 // Generate Dynamic Account
@@ -212,6 +213,12 @@ exports.securewaveWebhook = async (req, res) => {
       description: reference,
       status: "successful",
     });
+
+    await sendPushNotification(
+      user.oneSignalId,
+      "💰 Deposit Successful",
+      `₦${amount.toLocaleString()} has been credited to your BluePeak wallet.`
+    );
 
     await createActivity(
       user,

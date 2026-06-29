@@ -504,6 +504,81 @@ window.addEventListener("load", () => {
 
 });
 
+// ===============================
+// Load Live Activities
+// ===============================
+async function loadActivities() {
+  try {
+   console.log("Loading activities...");
+
+    const res = await fetch(`${API_URL}/activity`);
+    console.log("Status:", res.status);
+
+    const data = await res.json();
+    console.log("Activities:", data);
+
+    const marquee = document.getElementById("activityMarquee");
+
+    if (!marquee) {
+      console.log("activityMarquee not found");
+      return;
+    }
+
+    if (!data.length) {
+      marquee.innerHTML = "📢 Welcome to BluePeak Investment";
+      return;
+    }
+
+    // rest of your code
+
+    marquee.innerHTML = data
+      .map((activity) => {
+        let icon = "📢";
+
+        switch (activity.type) {
+          case "deposit":
+            icon = "🟢";
+            break;
+
+          case "withdrawal":
+            icon = "💸";
+            break;
+
+          case "investment":
+            icon = "💰";
+            break;
+
+          case "bonus":
+            icon = "🎁";
+            break;
+
+          case "referral":
+            icon = "👥";
+            break;
+
+          case "profit":
+            icon = "📈";
+            break;
+        }
+
+        return `${icon} ${activity.message}`;
+      })
+      .join(" &nbsp;&nbsp; • &nbsp;&nbsp; ");
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+// ===============================
+// Live Activity
+// ===============================
+if (document.getElementById("activityMarquee")) {
+  loadActivities();
+  setInterval(loadActivities, 30000);
+}
+
+
+
 updateGreeting();
 loadDashboardData();
 loadNotifications();

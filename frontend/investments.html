@@ -31,6 +31,12 @@
       <p>Active Plans</p>
       <h2 id="activePlans">0</h2>
     </div>
+
+    <div class="summary-card available-summary-card">
+      <p>Available Balance</p>
+      <h2 id="availableBalance">₦0</h2>
+      <small>Can be used to buy packages</small>
+    </div>
   </div>
 
   <div id="investmentsList"></div>
@@ -51,15 +57,22 @@ async function loadInvestments() {
   }
 
   try {
-    const response = await fetch(
-      `${API_URL}/investments/my-investments`,
-      {
-        method: "GET",
+    const [response, profileResponse] = await Promise.all([
+      fetch(
+        `${API_URL}/investments/my-investments`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      ),
+      fetch(`${API_URL}/auth/profile`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      }
-    );
+      })
+    ]);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -73,7 +86,17 @@ async function loadInvestments() {
     }
 
     const data = await response.json();
+    const profile = profileResponse.ok
+      ? await profileResponse.json()
+      : {};
     const container = document.getElementById("investmentsList");
+    const availableBalance =
+      Number(profile.depositWallet || 0) +
+      Number(profile.referralWallet || 0) +
+      Number(profile.withdrawableWallet || 0);
+
+    document.getElementById("availableBalance").innerText =
+      `₦${availableBalance.toLocaleString()}`;
 
     if (!data.investments || data.investments.length === 0) {
       container.innerHTML = `
@@ -226,5 +249,6 @@ async function loadInvestments() {
 loadInvestments();
 </script>
 
+<script src="./js/mobile-nav.js"></script>
 </body>
 </html>

@@ -15,8 +15,17 @@
   <div class="packages-header">
     <a href="dashboard.html">← Back</a>
     <h1>Investment Packages</h1>
-    <p>Choose a BluePeak plan and earn 10% daily ROI for 90 days.</p>
+    <p>Choose a BluePeak plan and earn 5% daily ROI for 90 days.</p>
   </div>
+
+  <section class="available-invest-card">
+    <div>
+      <small>Available to Invest</small>
+      <h2 id="packageAvailableBalance">&#8358;0</h2>
+      <p>Deposit, referral, and withdrawable wallet funds.</p>
+    </div>
+    <a href="deposit.html">Fund Wallet</a>
+  </section>
 
   <section class="packages-grid">
 
@@ -243,7 +252,36 @@ document.addEventListener("DOMContentLoaded", () => {
       buyPackage(selectedPackage);
     });
 
+  loadAvailableBalance();
+
 });
+
+async function loadAvailableBalance() {
+  const token = localStorage.getItem("token");
+  const balanceEl = document.getElementById("packageAvailableBalance");
+
+  if (!token || !balanceEl) return;
+
+  try {
+    const response = await fetch(`${API_URL}/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) return;
+
+    const user = await response.json();
+    const availableBalance =
+      Number(user.depositWallet || 0) +
+      Number(user.referralWallet || 0) +
+      Number(user.withdrawableWallet || 0);
+
+    balanceEl.innerText = `\u20A6${availableBalance.toLocaleString()}`;
+  } catch (error) {
+    console.log("Available balance error:", error);
+  }
+}
 
 async function buyPackage(packageKey) {
 
@@ -307,5 +345,6 @@ async function buyPackage(packageKey) {
 </script>
 
 
+<script src="./js/mobile-nav.js"></script>
 </body>
 </html>

@@ -127,12 +127,18 @@ async function loadInvestmentsSummary() {
 
   if (activeInvestmentBox && investments.length > 0) {
     const latest = investments[0];
+    activeInvestmentBox.classList.add("active-investment-preview");
 
     activeInvestmentBox.innerHTML = `
-      <div>*</div>
-      <p><strong>${latest.packageName}</strong></p>
-      <p>&#8358;${formatMoney(latest.amount)} - ${latest.dailyROI}% Daily</p>
-      <a href="investments.html">View Plan</a>
+      <div class="active-plan-icon">
+        <img src="./images/icons/investments.svg" alt="">
+      </div>
+      <div class="active-plan-meta">
+        <span>Current Plan</span>
+        <h4>${escapeHTML(latest.packageName || "Active Investment")}</h4>
+        <p>&#8358;${formatMoney(latest.amount)} - ${latest.dailyROI || 5}% Daily</p>
+      </div>
+      <a class="active-plan-link" href="investments.html">View Plan</a>
     `;
   }
 

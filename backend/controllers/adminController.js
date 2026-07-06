@@ -232,7 +232,7 @@ exports.updateWithdrawalStatus = async (req, res) => {
     // REJECTED
     if (status === "rejected") {
 
-      if (withdrawal.withdrawalType === "normal") {
+      if (withdrawal.withdrawalType !== "emergency") {
 
         user.depositWallet += Number(
           withdrawal.walletBreakdown?.depositWallet || 0

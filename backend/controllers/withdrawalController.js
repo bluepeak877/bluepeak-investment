@@ -97,6 +97,7 @@ exports.createWithdrawal = async (req, res) => {
       accountNumber,
       accountName,
       walletBreakdown,
+      withdrawalType: "normal",
     });
 
     await Transaction.create({

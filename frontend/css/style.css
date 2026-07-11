@@ -4411,3 +4411,192 @@ img{
     max-height: 180px;
   }
 }
+
+/* ===============================
+   Dashboard Layout Refresh
+=============================== */
+.dashboard-left,
+.dashboard-right{
+  align-content:start;
+}
+
+.dashboard-left > .advertisement-slot{
+  margin:0 0 4px;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card{
+  grid-template-columns:1fr;
+  border:1px solid #dbeafe;
+  border-radius:18px;
+  background:linear-gradient(145deg,#fff 0%,#f8fbff 100%);
+  box-shadow:0 18px 42px rgba(15,23,42,.09);
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card img{
+  width:100%;
+  height:auto;
+  min-height:0;
+  aspect-ratio:16 / 7;
+  object-fit:contain;
+  padding:6px;
+  background:#f8fafc;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card div{
+  padding:14px 16px 16px;
+  gap:7px;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card h3{
+  color:#0f172a;
+  font-size:15px;
+  font-weight:950;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card p{
+  color:#64748b;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card a{
+  min-height:34px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background:linear-gradient(135deg,#07339a,#2563eb);
+  box-shadow:0 10px 20px rgba(37,99,235,.18);
+}
+
+.live-activity-card{
+  margin-bottom:0;
+  border-color:#dbeafe;
+  border-radius:18px;
+  background:linear-gradient(145deg,#fff 0%,#f8fbff 100%);
+  box-shadow:0 14px 34px rgba(15,23,42,.08);
+}
+
+.wallet-card{
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:24px;
+  background:linear-gradient(145deg,#07339a 0%,#1737d4 56%,#3f5cff 100%);
+  box-shadow:0 22px 48px rgba(37,99,235,.28);
+}
+
+.wallet-breakdown div{
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.available-box{
+  background:rgba(255,255,255,.24)!important;
+}
+
+@media(max-width:700px){
+  body{
+    background:#101114;
+  }
+
+  .main{
+    padding:8px 10px 92px;
+    background:#f3f6fb;
+  }
+
+  .topbar{
+    min-height:42px;
+    margin-bottom:10px;
+  }
+
+  .welcome{
+    margin-bottom:12px;
+    padding:14px 15px;
+    border-radius:16px;
+    box-shadow:0 12px 28px rgba(15,23,42,.06);
+  }
+
+  .welcome h1{
+    font-size:22px;
+  }
+
+  .user-level{
+    min-height:26px;
+    padding:5px 9px;
+    font-size:11px;
+  }
+
+  .dashboard-left,
+  .dashboard-right{
+    display:grid;
+    gap:12px;
+  }
+
+  .wallet-card{
+    margin-bottom:0;
+    padding:15px;
+    border-radius:18px;
+  }
+
+  .wallet-card h2{
+    max-width:none;
+    font-size:27px;
+    line-height:1.12;
+  }
+
+  .wallet-breakdown{
+    gap:8px!important;
+  }
+
+  .wallet-breakdown div{
+    min-height:50px;
+    padding:8px 9px;
+    border-radius:11px;
+  }
+
+  .wallet-breakdown small{
+    font-size:9px;
+  }
+
+  .wallet-breakdown h4{
+    font-size:12px;
+  }
+
+  .live-activity-card{
+    padding:12px;
+    border-radius:16px;
+  }
+
+  .dashboard-left > .advertisement-slot{
+    margin:0;
+    gap:12px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card{
+    border-radius:16px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card img{
+    max-height:none;
+    aspect-ratio:16 / 7;
+    padding:5px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card div{
+    padding:11px 13px 13px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card h3{
+    font-size:13px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card p{
+    font-size:10.5px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card a{
+    min-height:30px;
+    padding:7px 11px;
+    font-size:11px;
+  }
+}

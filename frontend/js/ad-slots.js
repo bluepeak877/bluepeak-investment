@@ -50,7 +50,7 @@
   }
 
   function findMountPoint() {
-    if (page === "dashboard.html") return document.querySelector(".welcome");
+    if (page === "dashboard.html") return document.querySelector(".live-activity-card") || document.querySelector(".welcome");
     if (page === "packages.html") return document.querySelector(".available-invest-card");
     return document.querySelector("main section, main, .main");
   }

@@ -1,5 +1,9 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const {
+  protect,
+  adminOnly,
+} = require("../middleware/authMiddleware");
 
 exports.protect = async (req, res, next) => {
   try {

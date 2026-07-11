@@ -19,6 +19,7 @@ const telegramRoutes = require("./routes/telegramRoutes");
 const activityRoutes = require("./routes/activityRoutes");
 const oneSignalRoutes = require("./routes/oneSignalRoutes");
 const testNotificationRoutes = require("./routes/testNotificationRoutes");
+const advertisementRoutes = require("./routes/advertisementRoutes");
 dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
@@ -42,6 +43,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/telegram", telegramRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/onesignal", oneSignalRoutes);
+app.use("/api/advertisements", advertisementRoutes);
 app.use(
   "/api/test-notification",
   testNotificationRoutes
@@ -49,7 +51,7 @@ app.use(
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));
 });
-
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const PORT = process.env.PORT || 3001;
 
 mongoose

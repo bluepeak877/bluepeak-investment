@@ -1370,6 +1370,9 @@ body{
 }
 
 .secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   padding: 14px;
   border: none;
   border-radius: 12px;
@@ -4336,5 +4339,75 @@ img{
     width:34px;
     height:34px;
     padding:6px;
+  }
+}
+/* Advertisement Slots */
+.advertisement-slot {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 18px 0 24px;
+}
+
+.advertisement-card {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  min-height: 118px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.advertisement-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 118px;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.advertisement-card div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+}
+
+.advertisement-card h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.advertisement-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.advertisement-card a {
+  width: fit-content;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@media (max-width: 520px) {
+  .advertisement-card {
+    grid-template-columns: 1fr;
+  }
+
+  .advertisement-card img {
+    height: auto;
+    max-height: 180px;
   }
 }

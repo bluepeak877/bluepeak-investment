@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advertisement Manager | BluePeak</title>
+
+    <link rel="stylesheet" href="./advertisements.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="top-bar">
+        <h1><i class="fa-solid fa-bullhorn"></i> Advertisement Manager</h1>
+
+        <button id="addBtn">
+            <i class="fa-solid fa-plus"></i>
+            Add Advertisement
+        </button>
+    </div>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Preview</th>
+                    <th>Title</th>
+                    <th>Placement</th>
+                    <th>Status</th>
+                    <th>Order</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="advertisementTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- Modal -->
+
+<div id="advertisementModal" class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="modalTitle">Add Advertisement</h2>
+
+        <form id="advertisementForm">
+
+            <input type="hidden" id="advertisementId">
+
+            <input
+                type="file"
+                id="image"
+                accept="image/*"
+            >
+
+            <img
+                id="imagePreview"
+                src=""
+                style="display:none;width:100%;height:auto;max-height:180px;object-fit:contain;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin:10px 0;"
+            >
+
+            <input
+                type="text"
+                id="title"
+                placeholder="Title"
+                required
+            >
+
+            <textarea
+                id="description"
+                placeholder="Description"
+            ></textarea>
+
+            <input
+                type="text"
+                id="buttonText"
+                placeholder="Button Text"
+            >
+
+            <input
+                type="text"
+                id="linkValue"
+                placeholder="Custom URL (only for Custom URL links)"
+            >
+
+            <select id="placement">
+                <option value="dashboard">Dashboard</option>
+                <option value="packages">Packages</option>
+                <option value="wallet">Wallet</option>
+                <option value="referral">Referral</option>
+                <option value="all">All Pages</option>
+            </select>
+
+            <select id="linkType">
+                <option value="packages">Packages</option>
+                <option value="deposit">Deposit</option>
+                <option value="withdrawal">Withdrawal</option>
+                <option value="referral">Referral</option>
+                <option value="dashboard">Dashboard</option>
+                <option value="dailyBonus">Daily Bonus</option>
+                <option value="custom">Custom URL</option>
+            </select>
+
+            <input
+                type="number"
+                id="displayOrder"
+                value="1"
+                min="1"
+            >
+
+            <input
+                type="date"
+                id="startDate"
+            >
+
+            <input
+                type="date"
+                id="endDate"
+            >
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    id="isActive"
+                    checked
+                >
+
+                Active Advertisement
+
+            </label>
+
+            <button
+                type="submit"
+                id="saveBtn"
+            >
+                Save Advertisement
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="./js/config.js"></script>
+<script src="./advertisements.js"></script>
+
+</body>
+</html>

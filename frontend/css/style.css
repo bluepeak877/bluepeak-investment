@@ -4600,3 +4600,100 @@ img{
     font-size:11px;
   }
 }
+/* ===============================
+   Dashboard Advertisement Fit Fix
+=============================== */
+.dashboard-left > .advertisement-slot{
+  grid-template-columns:1fr;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card{
+  display:block;
+  padding:10px;
+  overflow:hidden;
+  border-radius:18px;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card img{
+  display:block;
+  width:100%;
+  height:clamp(170px, 28vw, 260px);
+  max-height:260px;
+  min-height:0;
+  aspect-ratio:auto;
+  object-fit:contain;
+  padding:0;
+  border-radius:14px;
+  background:#f8fafc;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card div{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px 14px;
+  padding:12px 4px 2px;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card h3{
+  min-width:0;
+  font-size:14px;
+  line-height:1.25;
+  margin:0;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card p{
+  grid-column:1;
+  min-width:0;
+  margin:0;
+  overflow:hidden;
+  color:#64748b;
+  font-size:11px;
+  line-height:1.4;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+}
+
+.dashboard-left > .advertisement-slot .advertisement-card a{
+  grid-column:2;
+  grid-row:1 / span 2;
+  white-space:nowrap;
+}
+
+@media(max-width:700px){
+  .dashboard-left > .advertisement-slot .advertisement-card{
+    padding:7px;
+    border-radius:16px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card img{
+    height:clamp(130px, 43vw, 175px);
+    max-height:175px;
+    border-radius:13px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card div{
+    grid-template-columns:1fr;
+    gap:6px;
+    padding:9px 3px 2px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card h3{
+    font-size:12px;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card p{
+    grid-column:auto;
+    font-size:10px;
+    -webkit-line-clamp:2;
+  }
+
+  .dashboard-left > .advertisement-slot .advertisement-card a{
+    grid-column:auto;
+    grid-row:auto;
+    width:max-content;
+    min-height:28px;
+    padding:7px 10px;
+  }
+}

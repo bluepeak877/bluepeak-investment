@@ -30,7 +30,7 @@
 
   <div class="card form-card">
     <label for="amount">Amount</label>
-    <input type="number" id="amount" min="1" placeholder="Enter amount">
+    <input type="number" id="amount" min="10000" max="10000" placeholder="Enter ₦10,000">
 
     <label for="bankName">Bank Name</label>
     <input type="text" id="bankName" placeholder="Enter bank name">
@@ -127,7 +127,9 @@
     </li>
 
     <li>
-      Minimum withdrawal amount is <strong>₦1,000</strong>.
+      Your available balance must be at least
+      <strong>&#8358;10,000</strong>. Normal withdrawal amount is
+      fixed at <strong>&#8358;10,000</strong>.
     </li>
 
     <li>
@@ -168,6 +170,8 @@
 const API_URL =
   window.BLUEPEAK_CONFIG?.API_URL || "https://bluepeak.ng/api";
 const token = localStorage.getItem("token");
+const NORMAL_WITHDRAWAL_AMOUNT = 10000;
+let currentAvailableBalance = 0;
 
 if (!token) {
   window.location.href = "login.html";
@@ -215,6 +219,7 @@ async function loadWithdrawals() {
     Number(user.referralWallet || 0) +
     Number(user.withdrawableWallet || 0)
     
+  currentAvailableBalance = availableBalance;
   setText("availableBalance", formatMoney(availableBalance));
     setText("lockedProfit",formatMoney(user.lockedProfit || 0));
 
@@ -265,6 +270,22 @@ async function submitWithdrawal() {
 
   if (!payload.amount || payload.amount <= 0) {
     message.innerText = "Enter a valid withdrawal amount.";
+    return;
+  }
+
+  if (payload.amount < NORMAL_WITHDRAWAL_AMOUNT) {
+    message.innerText = "Minimum withdrawal amount is ₦10,000.";
+    return;
+  }
+
+  if (payload.amount > NORMAL_WITHDRAWAL_AMOUNT) {
+    message.innerText = "Maximum withdrawal amount is ₦10,000.";
+    return;
+  }
+
+  if (currentAvailableBalance < NORMAL_WITHDRAWAL_AMOUNT) {
+    message.innerText =
+      "Your available balance must reach ₦10,000 before you can withdraw.";
     return;
   }
 

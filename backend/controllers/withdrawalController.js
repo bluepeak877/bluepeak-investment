@@ -5,6 +5,8 @@ const WithdrawalAnnouncement = require("../models/WithdrawalAnnouncement");
 const createActivity = require("../utils/createActivity");
 const sendPushNotification = require("../utils/sendPushNotification");
 
+const NORMAL_WITHDRAWAL_AMOUNT = 10000;
+
 exports.createWithdrawal = async (req, res) => {
   try {
     const {
@@ -40,6 +42,25 @@ exports.createWithdrawal = async (req, res) => {
       Number(user.depositWallet || 0) +
       Number(user.referralWallet || 0) +
       Number(user.withdrawableWallet || 0);
+
+    if (availableBalance < NORMAL_WITHDRAWAL_AMOUNT) {
+      return res.status(400).json({
+        message:
+          "Your available balance must be at least ₦10,000 before you can withdraw.",
+      });
+    }
+
+    if (withdrawalAmount < NORMAL_WITHDRAWAL_AMOUNT) {
+      return res.status(400).json({
+        message: "Minimum withdrawal amount is ₦10,000",
+      });
+    }
+
+    if (withdrawalAmount > NORMAL_WITHDRAWAL_AMOUNT) {
+      return res.status(400).json({
+        message: "Maximum withdrawal amount is ₦10,000",
+      });
+    }
 
     if (withdrawalAmount > availableBalance) {
       return res.status(400).json({
